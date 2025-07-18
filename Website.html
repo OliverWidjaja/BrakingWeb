@@ -26,7 +26,7 @@
         
         .dashboard {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1500px;
             background: rgba(13, 22, 41, 0.9);
             border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
@@ -64,15 +64,24 @@
         }
         
         .control-cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex; /* Use flexbox for layout */
             gap: 15px;
         }
-        
-        @media (max-width: 768px) {
-            .control-cards {
-                grid-template-columns: 1fr;
-            }
+
+        .left-half {
+            display: flex;
+            flex-direction: column; /* Stack cards vertically */
+            flex: 1; /* Take up 1 part of the space */
+            max-width: 25%; /* Set max-width to 25% for a quarter of the space */
+        }
+
+        .empty-card {
+            flex: 3; /* Take up 3 parts of the space */
+            background: rgba(20, 33, 61, 0.6); /* Optional styling */
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(64, 144, 203, 0.3);
         }
         
         .card {
@@ -83,9 +92,13 @@
             transition: transform 0.3s ease;
             border: 1px solid rgba(64, 144, 203, 0.3);
         }
-        
+
+        /* Alternatively, you can specifically target the snow-card */
+        .snow-card {
+            margin-bottom: 15px; /* Specific margin for the Snow Conditions card */
+        }
+
         .card:hover {
-            transform: translateY(-5px);
             background: rgba(20, 33, 61, 0.8);
         }
         
@@ -240,15 +253,6 @@
             padding: 10px;
         }
         
-        .footer {
-            text-align: center;
-            padding: 15px;
-            color: #a0c8ff;
-            font-size: 0.9rem;
-            background: rgba(8, 15, 31, 0.9);
-            border-top: 1px solid rgba(100, 149, 237, 0.2);
-        }
-        
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -298,58 +302,64 @@
 <body>
     <div class="dashboard">
         <header>
-            <h1>Smart Braking Distance Model</h1>
+            <h1>Smart Braking Model</h1>
             <div class="subtitle">Powered by Picasso Gen-AI</div>
         </header>
         
         <div class="main-content">
             <div class="control-cards">
-                <div class="card snow-card">
-                    <div class="card-header">
-                        <div class="card-header-content">
-                            <div class="card-icon">
-                                <i class="fas fa-snowflake"></i>
+                <div class="left-half">
+                    <div class="card snow-card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon">
+                                    <i class="fas fa-snowflake"></i>
+                                </div>
+                                <h2 class="card-title">Snow Conditions</h2>
                             </div>
-                            <h2 class="card-title">Snow Conditions</h2>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="snowToggle" checked>
+                                <span class="slider-switch"></span>
+                            </label>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="snowToggle" checked>
-                            <span class="slider-switch"></span>
-                        </label>
+                        
+                        <div class="slider-container">
+                            <div class="slider-wrapper" id="snowSliderWrapper">
+                                <div class="slider-track"></div>
+                                <div class="slider-fill" id="snowSliderFill"></div>
+                                <input type="range" min="0" max="100" value="50" class="slider" id="snowSlider">
+                            </div>
+                            <div class="slider-value" id="snowValue">50 cm</div>
+                        </div>
                     </div>
                     
-                    <div class="slider-container">
-                        <div class="slider-wrapper" id="snowSliderWrapper">
-                            <div class="slider-track"></div>
-                            <div class="slider-fill" id="snowSliderFill"></div>
-                            <input type="range" min="0" max="100" value="50" class="slider" id="snowSlider">
+                    <div class="card incline-card">
+                        <div class="card-header">
+                            <div class="card-header-content">
+                                <div class="card-icon">
+                                    <i class="fas fa-mountain"></i>
+                                </div>
+                                <h2 class="card-title">Incline Angle</h2>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="inclineToggle" checked>
+                                <span class="slider-switch"></span>
+                            </label>
                         </div>
-                        <div class="slider-value" id="snowValue">50 cm</div>
+                        
+                        <div class="slider-container">
+                            <div class="slider-wrapper" id="inclineSliderWrapper">
+                                <div class="slider-track"></div>
+                                <div class="slider-fill" id="inclineSliderFill"></div>
+                                <input type="range" min="0" max="90" value="0" class="slider" id="inclineSlider">
+                            </div>
+                            <div class="slider-value" id="inclineValue">0°</div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="card incline-card">
-                    <div class="card-header">
-                        <div class="card-header-content">
-                            <div class="card-icon">
-                                <i class="fas fa-mountain"></i>
-                            </div>
-                            <h2 class="card-title">Incline Angle</h2>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="inclineToggle" checked>
-                            <span class="slider-switch"></span>
-                        </label>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <div class="slider-wrapper" id="inclineSliderWrapper">
-                            <div class="slider-track"></div>
-                            <div class="slider-fill" id="inclineSliderFill"></div>
-                            <input type="range" min="0" max="90" value="0" class="slider" id="inclineSlider">
-                        </div>
-                        <div class="slider-value" id="inclineValue">0°</div>
-                    </div>
+
+                <div class="card empty-card">
+                    <!-- This card is intentionally left empty for the module -->
                 </div>
             </div>
             
@@ -394,9 +404,6 @@
             </div>
         </div>
         
-        <div class="footer">
-            <p>Smart Braking Distance Model - Group 4</p>
-        </div>
     </div>
 
     <script>
