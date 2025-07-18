@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compact Snow & Incline Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f1b31, #1e3a5f);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        
+        .dashboard {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(13, 22, 41, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(100, 149, 237, 0.2);
+        }
+        
+        header {
+            background: rgba(8, 15, 31, 0.95);
+            padding: 15px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(100, 149, 237, 0.3);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: #a0c8ff;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .control-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .control-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(20, 33, 61, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(64, 144, 203, 0.3);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(20, 33, 61, 0.8);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(100, 180, 255, 0.3);
+        }
+        
+        .card-header-content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4facfe;
+        }
+        
+        .slider-container {
+            width: 100%;
+            padding: 15px 0;
+            position: relative;
+        }
+        
+        .slider-wrapper {
+            width: 100%;
+            position: relative;
+            height: 22px;
+            margin: 20px 0;
+        }
+        
+        .slider-track {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: rgba(30, 50, 100, 0.6);
+            border-radius: 5px;
+            top: 6px;
+        }
+        
+        .slider-fill {
+            position: absolute;
+            height: 10px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            border-radius: 5px;
+            top: 6px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 22px;
+            -webkit-appearance: none;
+            background: transparent;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .slider-wrapper.disabled .slider-fill {
+            background: rgba(30, 50, 100, 0.3);
+        }
+        
+        .slider:focus {
+            outline: none;
+        }
+        
+        .slider-wrapper.disabled .slider-value {
+            opacity: 0.5;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        .slider-value {
+            display: block;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00f2fe;
+            margin-top: 10px;
+        }
+        
+        .graph-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .graph-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4facfe;
+        }
+        
+        .graph-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .graph-btn {
+            background: rgba(30, 50, 100, 0.6);
+            color: #a0c8ff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .graph-btn:hover {
+            background: rgba(30, 50, 100, 0.9);
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 180px;
+            background: rgba(15, 30, 60, 0.4);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #a0c8ff;
+            font-size: 0.9rem;
+            background: rgba(8, 15, 31, 0.9);
+            border-top: 1px solid rgba(100, 149, 237, 0.2);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, #4a5568, #2d3748);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: linear-gradient(to right, #e2e8f0, #cbd5e0);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider-switch {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+        
+        input:checked + .slider-switch:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>Smart Braking Distance Model</h1>
+            <div class="subtitle">Powered by Picasso Gen-AI</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="control-cards">
+                <div class="card snow-card">
+                    <div class="card-header">
+                        <div class="card-header-content">
+                            <div class="card-icon">
+                                <i class="fas fa-snowflake"></i>
+                            </div>
+                            <h2 class="card-title">Snow Conditions</h2>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="snowToggle" checked>
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-wrapper" id="snowSliderWrapper">
+                            <div class="slider-track"></div>
+                            <div class="slider-fill" id="snowSliderFill"></div>
+                            <input type="range" min="0" max="100" value="50" class="slider" id="snowSlider">
+                        </div>
+                        <div class="slider-value" id="snowValue">50 cm</div>
+                    </div>
+                </div>
+                
+                <div class="card incline-card">
+                    <div class="card-header">
+                        <div class="card-header-content">
+                            <div class="card-icon">
+                                <i class="fas fa-mountain"></i>
+                            </div>
+                            <h2 class="card-title">Incline Angle</h2>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="inclineToggle" checked>
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-wrapper" id="inclineSliderWrapper">
+                            <div class="slider-track"></div>
+                            <div class="slider-fill" id="inclineSliderFill"></div>
+                            <input type="range" min="0" max="90" value="0" class="slider" id="inclineSlider">
+                        </div>
+                        <div class="slider-value" id="inclineValue">0°</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card metrics-card">
+                <div class="card-header">
+                    <div class="card-header-content">
+                        <div class="card-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h2 class="card-title">Performance Metrics</h2>
+                    </div>
+                </div>
+    
+                <div class="graph-container">
+                    <div class="graph-item" style="flex: 1;">
+                        <div class="graph-header">
+                            <h3 class="graph-title">Speed vs Distance</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="speedChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="graph-item" style="flex: 1;">
+                        <div class="graph-header">
+                            <h3 class="graph-title">Acceleration vs Distance</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="accelerationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="graph-item" style="flex: 1;">
+                        <div class="graph-header">
+                            <h3 class="graph-title">Jerk vs Distance</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="inertiaChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Smart Braking Distance Model - Group 4</p>
+        </div>
+    </div>
+
+    <script>
+        // Snow toggle functionality
+        const snowToggle = document.getElementById('snowToggle');
+        const snowSlider = document.getElementById('snowSlider');
+        const snowValue = document.getElementById('snowValue');
+        const snowSliderFill = document.getElementById('snowSliderFill');
+        const snowSliderWrapper = document.getElementById('snowSliderWrapper');
+        
+        function updateSnowSliderFill() {
+            const value = snowSlider.value;
+            const max = snowSlider.max;
+            const percent = (value / max) * 100;
+            snowSliderFill.style.width = `${percent}%`;
+        }
+        
+        snowToggle.addEventListener('change', function() {
+            if (this.checked) {
+                snowSlider.disabled = false;
+                snowValue.style.opacity = '1';
+                snowSliderWrapper.classList.remove('disabled');
+            } else {
+                snowSlider.disabled = true;
+                snowValue.style.opacity = '0.5';
+                snowSliderWrapper.classList.add('disabled');
+            }
+        });
+        
+        // Snow slider functionality
+        snowSlider.addEventListener('input', function() {
+            snowValue.textContent = this.value + ' cm';
+            updateSnowSliderFill();
+        });
+        
+        // Initialize snow slider fill
+        updateSnowSliderFill();
+        
+        // Incline toggle functionality
+        const inclineToggle = document.getElementById('inclineToggle');
+        const inclineSlider = document.getElementById('inclineSlider');
+        const inclineValue = document.getElementById('inclineValue');
+        const inclineSliderFill = document.getElementById('inclineSliderFill');
+        const inclineSliderWrapper = document.getElementById('inclineSliderWrapper');
+        
+        function updateInclineSliderFill() {
+            const value = inclineSlider.value;
+            const max = inclineSlider.max;
+            const percent = (value / max) * 100;
+            inclineSliderFill.style.width = `${percent}%`;
+        }
+        
+        inclineToggle.addEventListener('change', function() {
+            if (this.checked) {
+                inclineSlider.disabled = false;
+                inclineValue.style.opacity = '1';
+                inclineSliderWrapper.classList.remove('disabled');
+            } else {
+                inclineSlider.disabled = true;
+                inclineValue.style.opacity = '0.5';
+                inclineSliderWrapper.classList.add('disabled');
+            }
+        });
+        
+        // Incline slider functionality
+        inclineSlider.addEventListener('input', function() {
+            inclineValue.textContent = this.value + '°';
+            updateInclineSliderFill();
+        });
+        
+        // Initialize incline slider fill
+        updateInclineSliderFill();
+        
+        // Initialize charts
+        const speedCtx = document.getElementById('speedChart').getContext('2d');
+        const accelerationCtx = document.getElementById('accelerationChart').getContext('2d');
+        const inertiaCtx = document.getElementById('inertiaChart').getContext('2d');
+        
+        // Distance labels (x-axis)
+        const distanceLabels = ['0m', '20m', '40m', '60m', '80m', '100m'];
+        
+        // Speed chart
+        const speedChart = new Chart(speedCtx, {
+            type: 'line',
+            data: {
+                labels: distanceLabels,
+                datasets: [{
+                    label: 'Speed',
+                    data: [0, 25, 45, 60, 45, 30],
+                    borderColor: '#00c6ff',
+                    backgroundColor: 'rgba(0, 198, 255, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Acceleration chart
+        const accelerationChart = new Chart(accelerationCtx, {
+            type: 'line',
+            data: {
+                labels: distanceLabels,
+                datasets: [{
+                    label: 'Acceleration',
+                    data: [0, 15, 30, 40, 25, 10],
+                    borderColor: '#92fe9d',
+                    backgroundColor: 'rgba(146, 254, 157, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Jerk chart
+        const inertiaChart = new Chart(inertiaCtx, {
+            type: 'line',
+            data: {
+                labels: distanceLabels,
+                datasets: [{
+                    label: 'Jerk',
+                    data: [10, 45, 70, 85, 60, 30],
+                    borderColor: '#ff7eb9',
+                    backgroundColor: 'rgba(255, 126, 185, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#a0c8ff',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
