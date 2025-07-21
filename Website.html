@@ -64,24 +64,13 @@
         }
         
         .control-cards {
-            display: flex; /* Use flexbox for layout */
+            display: flex;
             gap: 15px;
         }
 
-        .left-half {
-            display: flex;
-            flex-direction: column; /* Stack cards vertically */
-            flex: 1; /* Take up 1 part of the space */
-            max-width: 25%; /* Set max-width to 25% for a quarter of the space */
-        }
-
-        .empty-card {
-            flex: 3; /* Take up 3 parts of the space */
-            background: rgba(20, 33, 61, 0.6); /* Optional styling */
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(64, 144, 203, 0.3);
+        .combined-card {
+            flex: 1;
+            max-width: 30%;
         }
         
         .card {
@@ -91,11 +80,6 @@
             box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease;
             border: 1px solid rgba(64, 144, 203, 0.3);
-        }
-
-        /* Alternatively, you can specifically target the snow-card */
-        .snow-card {
-            margin-bottom: 15px; /* Specific margin for the Snow Conditions card */
         }
 
         .card:hover {
@@ -136,15 +120,23 @@
         
         .slider-container {
             width: 100%;
-            padding: 15px 0;
+            padding: 10px 0;
             position: relative;
+        }
+
+        .slider-group {
+            margin-bottom: 15px;
+        }
+
+        .slider-group:last-child {
+            margin-bottom: 0;
         }
         
         .slider-wrapper {
             width: 100%;
             position: relative;
             height: 22px;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         
         .slider-track {
@@ -200,10 +192,10 @@
         .slider-value {
             display: block;
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #00f2fe;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         .graph-container {
@@ -297,6 +289,25 @@
         input:checked + .slider-switch:before {
             transform: translateX(24px);
         }
+
+        .parameter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .parameter-title {
+            font-size: 1rem;
+            color: #a0c8ff;
+            display: flex;
+            align-items: center;
+        }
+
+        .parameter-icon {
+            margin-right: 8px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -308,22 +319,28 @@
         
         <div class="main-content">
             <div class="control-cards">
-                <div class="left-half">
-                    <div class="card snow-card">
-                        <div class="card-header">
-                            <div class="card-header-content">
-                                <div class="card-icon">
-                                    <i class="fas fa-snowflake"></i>
-                                </div>
-                                <h2 class="card-title">Snow Conditions</h2>
+                <div class="card combined-card">
+                    <div class="card-header">
+                        <div class="card-header-content">
+                            <div class="card-icon">
+                                <i class="fas fa-car-crash"></i>
                             </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="snowToggle" checked>
-                                <span class="slider-switch"></span>
-                            </label>
+                            <h2 class="card-title">Driving Conditions</h2>
                         </div>
-                        
-                        <div class="slider-container">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-group">
+                            <div class="parameter-header">
+                                <span class="parameter-title">
+                                    <i class="fas fa-snowflake parameter-icon"></i>
+                                    Snow Depth
+                                </span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="snowToggle" checked>
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
                             <div class="slider-wrapper" id="snowSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="snowSliderFill"></div>
@@ -331,23 +348,18 @@
                             </div>
                             <div class="slider-value" id="snowValue">50 cm</div>
                         </div>
-                    </div>
-                    
-                    <div class="card incline-card">
-                        <div class="card-header">
-                            <div class="card-header-content">
-                                <div class="card-icon">
-                                    <i class="fas fa-mountain"></i>
-                                </div>
-                                <h2 class="card-title">Incline Angle</h2>
-                            </div>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="inclineToggle" checked>
-                                <span class="slider-switch"></span>
-                            </label>
-                        </div>
                         
-                        <div class="slider-container">
+                        <div class="slider-group">
+                            <div class="parameter-header">
+                                <span class="parameter-title">
+                                    <i class="fas fa-mountain parameter-icon"></i>
+                                    Incline Angle
+                                </span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="inclineToggle" checked>
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
                             <div class="slider-wrapper" id="inclineSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="inclineSliderFill"></div>
@@ -357,9 +369,9 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="card empty-card">
-                    <!-- This card is intentionally left empty for the module -->
+                
+                <div class="card" style="flex: 2;">
+                    <!-- Empty space for module or additional content -->
                 </div>
             </div>
             
@@ -403,7 +415,6 @@
                 </div>
             </div>
         </div>
-        
     </div>
 
     <script>
