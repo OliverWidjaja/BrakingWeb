@@ -14,7 +14,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #0f1b31, #1e3a5f);
+            background: linear-gradient(135deg, #003366, #006699);
             color: #fff;
             min-height: 100vh;
             display: flex;
@@ -25,29 +25,28 @@
         .dashboard {
             width: 100%;
             max-width: 1500px;
-            background: rgba(13, 22, 41, 0.9);
+            background: rgba(230, 245, 255, 0.95);
             border-radius: 16px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(100, 149, 237, 0.2);
+            border: 1px solid rgba(0, 102, 153, 0.3);
         }
         header {
-            background: rgba(8, 15, 31, 0.95);
+            background: #003366;
             padding: 15px 25px;
             text-align: center;
-            border-bottom: 1px solid rgba(100, 149, 237, 0.3);
+            border-bottom: 1px solid rgba(0, 153, 204, 0.4);
         }
         h1 {
             font-size: 1.8rem;
             margin-bottom: 5px;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
+            font-weight: 700;
         }
         .subtitle {
             font-size: 0.9rem;
-            color: #a0c8ff;
+            color: #99ccff;
             opacity: 0.9;
         }
         .main-content {
@@ -76,15 +75,16 @@
             height: auto;
         }
         .card {
-            background: rgba(20, 33, 61, 0.6);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
-            border: 1px solid rgba(64, 144, 203, 0.3);
+            border: 1px solid rgba(0, 102, 153, 0.2);
         }
         .card:hover {
-            background: rgba(20, 33, 61, 0.8);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.15);
         }
         .card-header {
             display: flex;
@@ -92,7 +92,7 @@
             justify-content: space-between;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(100, 180, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 102, 153, 0.3);
         }
         .card-header-content {
             display: flex;
@@ -101,18 +101,19 @@
         .card-icon {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            background: linear-gradient(135deg, #006699, #00cc99);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             margin-right: 12px;
             font-size: 18px;
+            color: #fff;
         }
         .card-title {
             font-size: 1.3rem;
             font-weight: 600;
-            color: #4facfe;
+            color: #003366;
         }
         .slider-container {
             width: 100%;
@@ -121,6 +122,9 @@
         }
         .slider-group {
             margin-bottom: 15px;
+            background: rgba(230, 245, 255, 0.7);
+            padding: 12px;
+            border-radius: 8px;
         }
         .slider-group:last-child {
             margin-bottom: 0;
@@ -135,14 +139,14 @@
             position: absolute;
             width: 100%;
             height: 10px;
-            background: rgba(30, 50, 100, 0.6);
+            background: rgba(0, 102, 153, 0.2);
             border-radius: 5px;
             top: 6px;
         }
         .slider-fill {
             position: absolute;
             height: 10px;
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            background: linear-gradient(90deg, #006699, #00cc99);
             border-radius: 5px;
             top: 6px;
         }
@@ -156,7 +160,7 @@
             z-index: 2;
         }
         .slider-wrapper.disabled .slider-fill {
-            background: rgba(30, 50, 100, 0.3);
+            background: rgba(0, 102, 153, 0.2);
         }
         .slider:focus {
             outline: none;
@@ -169,23 +173,29 @@
             height: 22px;
             width: 22px;
             border-radius: 50%;
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            background: linear-gradient(to right, #006699, #00cc99);
             cursor: pointer;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.9);
         }
         .slider-value {
             display: block;
             text-align: center;
             font-size: 1.5rem;
             font-weight: 700;
-            color: #00f2fe;
+            color: #006699;
             margin-top: 5px;
         }
         .graph-container {
             display: flex;
             justify-content: space-between;
             gap: 15px;
+        }
+        .graph-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid rgba(0, 102, 153, 0.2);
         }
         .graph-header {
             display: flex;
@@ -196,29 +206,30 @@
         .graph-title {
             font-size: 1rem;
             font-weight: 600;
-            color: #4facfe;
+            color: #003366;
         }
         .graph-controls {
             display: flex;
             gap: 6px;
         }
         .graph-btn {
-            background: rgba(30, 50, 100, 0.6);
-            color: #a0c8ff;
+            background: rgba(0, 102, 153, 0.1);
+            color: #006699;
             border: none;
             padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 0.8rem;
+            border: 1px solid rgba(0, 102, 153, 0.2);
         }
         .graph-btn:hover {
-            background: rgba(30, 50, 100, 0.9);
+            background: rgba(0, 102, 153, 0.2);
         }
         .chart-container {
             width: 100%;
             height: 180px;
-            background: rgba(15, 30, 60, 0.4);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 8px;
             padding: 10px;
         }
@@ -240,7 +251,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to right, #4a5568, #2d3748);
+            background: linear-gradient(to right, #b3cce6, #99b3cc);
             transition: .4s;
             border-radius: 34px;
         }
@@ -251,12 +262,12 @@
             width: 20px;
             left: 3px;
             bottom: 3px;
-            background: linear-gradient(to right, #e2e8f0, #cbd5e0);
+            background: linear-gradient(to right, #f0f7ff, #e0ecff);
             transition: .4s;
             border-radius: 50%;
         }
         input:checked + .slider-switch {
-            background: linear-gradient(to right, #00c6ff, #0072ff);
+            background: linear-gradient(to right, #006699, #00cc99);
         }
         input:checked + .slider-switch:before {
             transform: translateX(24px);
@@ -269,13 +280,15 @@
         }
         .parameter-title {
             font-size: 1rem;
-            color: #a0c8ff;
+            color: #003366;
             display: flex;
             align-items: center;
+            font-weight: 500;
         }
         .parameter-icon {
             margin-right: 8px;
             font-size: 14px;
+            color: #006699;
         }
         /* Simulation styles */
         .simulation-header {
@@ -284,54 +297,58 @@
             justify-content: space-between;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(100, 180, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 102, 153, 0.3);
         }
         .simulation-title {
             font-size: 1.3rem;
             font-weight: 600;
-            color: #4facfe;
+            color: #003366;
         }
         .sim-btn-group {
             display: flex;
             gap: 8px;
         }
         .sim-btn {
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            background: linear-gradient(90deg, #006699, #00cc99);
             color: #fff;
             border: none;
             border-radius: 6px;
-            padding: 6px 16px;
+            padding: 8px 18px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.14);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             transition: background 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .sim-btn:active {
             transform: scale(0.97);
         }
         .sim-btn:disabled {
-            background: #3a5068;
-            color: #b0c8e2;
+            background: #99b3cc;
+            color: #e0ecff;
             cursor: not-allowed;
             opacity: 0.7;
         }
         .simulation-view {
             flex: 1 1 auto;
             min-height: 180px;
-            background: rgba(15, 30, 60, 0.4);
+            background: rgba(230, 245, 255, 0.7);
             border-radius: 8px;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid rgba(0, 102, 153, 0.2);
         }
         .road {
             position: absolute;
             width: 100%;
             height: 80px;
-            background: #333;
+            background: #4d4d4d;
             top: 50%;
             left: 0;
             transform: translateY(-50%);
@@ -343,14 +360,13 @@
             position: absolute;
             width: 100%;
             height: 4px;
-            background: repeating-linear-gradient(to right, white, white 20px, transparent 20px, transparent 40px);
+            background: repeating-linear-gradient(to right, #e6f2ff, #e6f2ff 20px, transparent 20px, transparent 40px);
             bottom: 50%;
         }
         .car {
             position: absolute;
             width: 60px;
             height: 30px;
-            background: #00c6ff;
             border-radius: 5px;
             bottom: 40%;
             transform: translateY(-50%);
@@ -366,7 +382,6 @@
             position: absolute;
             width: 10px;
             height: 15px;
-            background: #0072ff;
             bottom: -5px;
             border-radius: 3px;
         }
@@ -379,18 +394,22 @@
         .car-front {
             left: 30%;
             z-index: 2;
-            background: #ff7eb9;
+            background: #00cc99;
         }
         .car-front::before, .car-front::after {
-            background: #ff4d9e;
+            background: #008866;
         }
         .car-rear {
             z-index: 1;
+            background: #006699;
+        }
+        .car-rear::before, .car-rear::after {
+            background: #003366;
         }
         .distance-indicator {
             position: absolute;
             height: 2px;
-            background: #00f2fe;
+            background: #006699;
             bottom: 55%;
             z-index: 3;
             display: flex;
@@ -399,14 +418,38 @@
         }
         .distance-value {
             position: absolute;
-            background: rgba(0, 242, 254, 0.8);
-            color: #0f1b31;
-            padding: 2px 6px;
+            background: rgba(0, 102, 153, 0.9);
+            color: #ffffff;
+            padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.7rem;
             font-weight: bold;
             top: -15px;
             white-space: nowrap;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .control-cards {
+                flex-direction: column;
+            }
+            .combined-card, .simulation-container {
+                max-width: 100%;
+                flex: 1 1 100%;
+            }
+            .graph-container {
+                flex-direction: column;
+            }
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #003366;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0, 102, 153, 0.2);
+            background: rgba(230, 245, 255, 0.8);
         }
     </style>
 </head>
@@ -556,10 +599,14 @@
                 </div>
             </div>
         </div>
+        
+        <div class="footer">
+            Hong Kong Productivity Council | Smart Braking Simulation Dashboard
+        </div>
     </div>
 
     <script>
-        // --- Driving condition sliders (unchanged) ---
+        // Driving condition sliders
         const snowToggle = document.getElementById('snowToggle');
         const snowSlider = document.getElementById('snowSlider');
         const snowValue = document.getElementById('snowValue');
@@ -643,7 +690,7 @@
         });
         updateDistanceSliderFill();
 
-        // --- Vehicle Simulation Animation Logic ---
+        // Vehicle Simulation Animation Logic
         const simStartBtn = document.getElementById('simStartBtn');
         const simStopBtn = document.getElementById('simStopBtn');
         const simRestartBtn = document.getElementById('simRestartBtn');
@@ -738,7 +785,7 @@
         });
         updateCarSimulation(20);
 
-        // --- Chart.js Metrics (unchanged) ---
+        // Chart.js Metrics
         const speedCtx = document.getElementById('speedChart').getContext('2d');
         const accelerationCtx = document.getElementById('accelerationChart').getContext('2d');
         const inertiaCtx = document.getElementById('inertiaChart').getContext('2d');
@@ -750,8 +797,8 @@
                 datasets: [{
                     label: 'Speed',
                     data: [0, 25, 45, 60, 45, 30],
-                    borderColor: '#00c6ff',
-                    backgroundColor: 'rgba(0, 198, 255, 0.1)',
+                    borderColor: '#006699',
+                    backgroundColor: 'rgba(0, 102, 153, 0.1)',
                     borderWidth: 2,
                     tension: 0.4,
                     fill: true
@@ -764,19 +811,19 @@
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     }
@@ -784,7 +831,7 @@
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     }
@@ -798,8 +845,8 @@
                 datasets: [{
                     label: 'Acceleration',
                     data: [0, 15, 30, 40, 25, 10],
-                    borderColor: '#92fe9d',
-                    backgroundColor: 'rgba(146, 254, 157, 0.1)',
+                    borderColor: '#00cc99',
+                    backgroundColor: 'rgba(0, 204, 153, 0.1)',
                     borderWidth: 2,
                     tension: 0.4,
                     fill: true
@@ -812,19 +859,19 @@
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     }
@@ -832,7 +879,7 @@
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     }
@@ -846,8 +893,8 @@
                 datasets: [{
                     label: 'Jerk',
                     data: [10, 45, 70, 85, 60, 30],
-                    borderColor: '#ff7eb9',
-                    backgroundColor: 'rgba(255, 126, 185, 0.1)',
+                    borderColor: '#0099cc',
+                    backgroundColor: 'rgba(0, 153, 204, 0.1)',
                     borderWidth: 2,
                     tension: 0.4,
                     fill: true
@@ -860,19 +907,19 @@
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
                         ticks: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     }
@@ -880,7 +927,7 @@
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#a0c8ff',
+                            color: '#003366',
                             font: { size: 10 }
                         }
                     }
