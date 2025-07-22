@@ -351,10 +351,12 @@
             background: #4d4d4d;
             top: 50%;
             left: 0;
-            transform: translateY(-50%);
+            transform: translateY(-50%) rotate(0deg);
+            transform-origin: center center;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: transform 0.5s ease;
         }
         .lane-markers {
             position: absolute;
@@ -659,6 +661,11 @@
         inclineSlider.addEventListener('input', function() {
             inclineValue.textContent = this.value + '°';
             updateInclineSliderFill();
+            
+            // Update road angle
+            const road = document.querySelector('.road');
+            const angle = this.value;
+            road.style.transform = `translateY(-50%) rotate(${-angle}deg)`; // Negative for natural uphill feel
         });
         updateInclineSliderFill();
         const distanceToggle = document.getElementById('distanceToggle');
