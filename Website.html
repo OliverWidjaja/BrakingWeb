@@ -543,16 +543,6 @@
             right: -10%;
             width: 60%;
         }
-
-        .snow-drift {
-            position: absolute;
-            bottom: 0;
-            background: linear-gradient(to top, #d1edff, #ffffff);
-            border-radius: 50% 50% 0 0;
-            z-index: 1;
-            filter: blur(2px);
-            opacity: 0.9;
-        }
         
         /* Responsive adjustments */
         @media (max-width: 992px) {
@@ -788,8 +778,6 @@
             if (!snowToggle.checked) {
                 document.getElementById('snowPileupLeft').style.height = '0';
                 document.getElementById('snowPileupRight').style.height = '0';
-                // Remove any existing drifts
-                document.querySelectorAll('.snow-drift').forEach(el => el.remove());
                 return;
             }
 
@@ -802,33 +790,6 @@
             // Update main pileups
             document.getElementById('snowPileupLeft').style.height = `${height}px`;
             document.getElementById('snowPileupRight').style.height = `${height}px`;
-            
-            // Create random snow drifts
-            const road = document.querySelector('.road');
-            // Clear existing drifts
-            document.querySelectorAll('.snow-drift').forEach(el => el.remove());
-            
-            // Number of drifts based on snow depth (more drifts for deeper snow)
-            const driftCount = Math.floor(snowDepth / 20) + 1;
-            
-            for (let i = 0; i < driftCount; i++) {
-                const drift = document.createElement('div');
-                drift.classList.add('snow-drift');
-                
-                // Random properties for each drift
-                const width = Math.random() * 80 + 40;
-                const driftHeight = height * (0.5 + Math.random() * 0.7); // 50-120% of main height
-                const position = Math.random() * 80 + 10; // 10-90% position
-                
-                drift.style.width = `${width}px`;
-                drift.style.height = `${driftHeight}px`;
-                drift.style.left = `${position}%`;
-                
-                // Random slight rotation for natural look
-                drift.style.transform = `rotate(${(Math.random() * 10 - 5)}deg)`;
-                
-                road.appendChild(drift);
-            }
         }
 
         // Update snow slider event listener to include pileups
