@@ -526,7 +526,93 @@
                 flex-direction: column;
             }
         }
-        
+        /* Replace the existing .car-weights and .car-weight styles with these: */
+        .car-weights {
+            position: absolute;
+            bottom: 100%; /* Position above the car */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column-reverse; /* Stack from bottom to top */
+            align-items: center;
+            gap: 2px;
+            margin-bottom: 5px; /* Small gap between weights and car */
+        }
+
+        .car-weight {
+            width: 40px;
+            height: 8px;
+            background: #666;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Add these styles to your CSS section */
+        .weather-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .sun {
+            position: absolute;
+            top: 20%;
+            right: 15%;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #FFD700, #FFA500);
+            border-radius: 50%;
+            box-shadow: 0 0 40px #FFD700;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 30%;
+            top: 15%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .cloud {
+            position: absolute;
+            background: #7F7F7F;
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+
+        /* Cloud shapes */
+        .cloud:nth-child(1) {
+            width: 100px;
+            height: 60px;
+            top: 20px;
+            left: 10%;
+        }
+
+        .cloud:nth-child(2) {
+            width: 150px;
+            height: 80px;
+            top: 40px;
+            left: 30%;
+        }
+
+        .cloud:nth-child(3) {
+            width: 120px;
+            height: 70px;
+            top: 10px;
+            left: 60%;
+        }
+
+        .cloud:nth-child(4) {
+            width: 90px;
+            height: 50px;
+            top: 30px;
+            left: 80%;
+        }
         /* Footer */
         .footer {
             text-align: center;
@@ -598,7 +684,21 @@
                             </div>
                             <div class="slider-value" id="inclineValue">0°</div>
                         </div>
-
+                        <!-- Inside the Driving Conditions card, add this after the distance slider group -->
+                        <div class="slider-group">
+                            <div class="parameter-header">
+                                <span class="parameter-title">
+                                    <i class="fas fa-weight-hanging parameter-icon"></i>
+                                    Car B Mass
+                                </span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <div class="slider-track"></div>
+                                <div class="slider-fill" id="massSliderFill"></div>
+                                <input type="range" min="0" max="5" value="0" class="slider" id="massSlider">
+                            </div>
+                            <div class="slider-value" id="massValue">1x</div>
+                        </div>
                         <div class="slider-group">
                             <div class="parameter-header">
                                 <span class="parameter-title">
@@ -635,6 +735,10 @@
                         </div>
                     </div>
                     <div class="simulation-view">
+                        <div class="weather-elements">
+                            <div class="sun"></div>
+                            <div class="clouds"></div>
+                        </div>
                         <div class="road">
                             <div class="lane-markers"></div>
                             <div class="car car-front">A</div>
@@ -818,12 +922,56 @@
         });
         updateDistanceSliderFill();
 
+        // Add these variables with your other declarations
+        const massSlider = document.getElementById('massSlider');
+        const massValue = document.getElementById('massValue');
+        const massSliderFill = document.getElementById('massSliderFill');
+        const carRear = document.querySelector('.car-rear');
+
+        // Add this function to update the mass visualization
+        function updateCarMass() {
+            const mass = parseInt(massSlider.value);
+            massValue.textContent = mass + 'x';
+            
+            // Remove existing weights if any
+            const existingWeights = carRear.querySelector('.car-weights');
+            if (existingWeights) {
+                existingWeights.remove();
+            }
+            
+            // Add weights if mass > 0
+            if (mass > 0) {
+                const weightsContainer = document.createElement('div');
+                weightsContainer.className = 'car-weights';
+                
+                // Add weight blocks based on mass value
+                for (let i = 0; i < mass; i++) {
+                    const weight = document.createElement('div');
+                    weight.className = 'car-weight';
+                    weightsContainer.appendChild(weight);
+                }
+                
+                carRear.appendChild(weightsContainer);
+            }
+        }
+
+        // Add this event listener with your others
+        massSlider.addEventListener('input', function() {
+            updateCarMass();
+            updateMassSliderFill();
+        });
+
+        function updateMassSliderFill() {
+            const value = massSlider.value;
+            const max = massSlider.max;
+            const percent = (value / max) * 100;
+            massSliderFill.style.width = `${percent}%`;
+        }
         // Vehicle Simulation Animation Logic
         const simStartBtn = document.getElementById('simStartBtn');
         const simStopBtn = document.getElementById('simStopBtn');
         const simRestartBtn = document.getElementById('simRestartBtn');
         const carFront = document.querySelector('.car-front');
-        const carRear = document.querySelector('.car-rear');
         const simulationView = document.querySelector('.simulation-view');
         const simDistanceValue = document.getElementById('simDistanceValue');
         const distanceIndicator = document.getElementById('distanceIndicator');
@@ -843,11 +991,31 @@
             if (this.checked) {
                 weatherValue.textContent = "Rainy";
                 simulationView.style.background = "linear-gradient(to bottom, #6D7B8D, #B0C4DE)";
-                // Add rain animation elements
+                
+                // Hide sun and show clouds
+                document.querySelector('.sun').style.opacity = '0';
+                const clouds = document.querySelector('.clouds');
+                clouds.style.opacity = '1';
+                
+                // Create cloud elements if they don't exist
+                if (clouds.children.length === 0) {
+                    for (let i = 0; i < 4; i++) {
+                        const cloud = document.createElement('div');
+                        cloud.className = 'cloud';
+                        clouds.appendChild(cloud);
+                    }
+                }
+                
+                // Add rain animation
                 addRainEffect();
             } else {
                 weatherValue.textContent = "Sunny";
                 simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
+                
+                // Show sun and hide clouds
+                document.querySelector('.sun').style.opacity = '1';
+                document.querySelector('.clouds').style.opacity = '0';
+                
                 // Remove rain animation
                 removeRainEffect();
             }
@@ -1172,12 +1340,20 @@
             updateDistanceSliderFill();
             updateCarSimulation(20); // Reset car positions
             
-            // Reset weather
+            // Reset weather elements
             weatherToggle.checked = false;
             weatherValue.textContent = "Sunny";
             simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
+            document.querySelector('.sun').style.opacity = '1';
+            document.querySelector('.clouds').style.opacity = '0';
             removeRainEffect();
-            
+
+            // Reset mass
+            massSlider.value = 0;
+            massValue.textContent = "0x";
+            updateMassSliderFill();
+            updateCarMass();
+                    
             // Reset road surface
             roadSurfaceToggle.checked = false;
             roadSurfaceValue.textContent = "Concrete";
