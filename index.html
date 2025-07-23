@@ -622,7 +622,7 @@
                             <div class="slider-wrapper" id="inclineSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="inclineSliderFill"></div>
-                                <input type="range" min="0" max="30" value="0" class="slider" id="inclineSlider">
+                                <input type="range" min="0" max="5" value="0" class="slider" id="inclineSlider">
                             </div>
                             <div class="slider-value" id="inclineValue">0°</div>
                         </div>
@@ -991,7 +991,7 @@
         function updateCarSimulation(positionB = null) {
             const distance = parseInt(distanceSlider.value);
             const simulationWidth = simulationView.offsetWidth;
-            const carWidth = 60;
+            const carWidth = 80;
             const carFrontPos = simulationWidth * 0.3;
             let carRearPos;
             if (positionB !== null) {
