@@ -432,6 +432,14 @@
             top: -18px;
             white-space: nowrap;
         }
+        .road-surface-state {
+            display: block;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #006699;
+            margin-top: 10px;
+        }
         .scenery {
             position: absolute;
             width: 100%;
@@ -495,7 +503,16 @@
             margin: 3px;
             border-radius: 2px;
         }
-        
+
+        .weather-state {
+            display: block;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #006699;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
         /* Responsive adjustments */
         @media (max-width: 992px) {
             .control-cards {
@@ -541,6 +558,32 @@
                     </div>
                     
                     <div class="slider-container">
+                        <div class="slider-group">
+                            <div class="parameter-header">
+                                <span class="parameter-title">
+                                    <i class="fas fa-cloud-rain parameter-icon"></i>
+                                    Weather Conditions
+                                </span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="weatherToggle">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                            <div class="weather-state" id="weatherValue">Sunny</div>
+                        </div>
+                        <div class="slider-group">
+                            <div class="parameter-header">
+                                <span class="parameter-title">
+                                    <i class="fas fa-road parameter-icon"></i>
+                                    Road Surface
+                                </span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="roadSurfaceToggle">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                            <div class="road-surface-state" id="roadSurfaceValue">Asphalt</div>
+                        </div>
                         <div class="slider-group">
                             <div class="parameter-header">
                                 <span class="parameter-title">
@@ -697,7 +740,23 @@
     </div>
 
     <script>
-        // Driving condition sliders
+        const weatherToggle = document.getElementById('weatherToggle');
+        const weatherValue = document.getElementById('weatherValue');
+        const roadSurfaceToggle = document.getElementById('roadSurfaceToggle');
+        const roadSurfaceValue = document.getElementById('roadSurfaceValue');
+        const roadElement = document.querySelector('.road');
+
+        roadSurfaceToggle.addEventListener('change', function() {
+            if (this.checked) {
+                roadSurfaceValue.textContent = "Asphalt";
+                roadElement.style.background = "#4d4d4d"; // Dark grey for asphalt
+            } else {
+                roadSurfaceValue.textContent = "Concrete";
+                roadElement.style.background = "#8B7355"; // Brown for concrete
+            }
+        });
+        roadElement.style.background = "#4d4d4d";
+        // incline  sliders
         const inclineToggle = document.getElementById('inclineToggle');
         const inclineSlider = document.getElementById('inclineSlider');
         const inclineValue = document.getElementById('inclineValue');
@@ -714,10 +773,14 @@
                 inclineSlider.disabled = false;
                 inclineValue.style.opacity = '1';
                 inclineSliderWrapper.classList.remove('disabled');
+                // Apply current slider value to road
+                const angle = inclineSlider.value;
+                document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
             } else {
                 inclineSlider.disabled = true;
                 inclineValue.style.opacity = '0.5';
                 inclineSliderWrapper.classList.add('disabled');
+                document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             }
         });
         inclineSlider.addEventListener('input', function() {
@@ -728,7 +791,11 @@
             const angle = this.value;
             const road = document.querySelector('.road');
             road.style.transform = `translateY(-50%) rotate(${-angle}deg)`;
-            
+            // Only update road angle if toggle is on
+            if (inclineToggle.checked) {
+                const angle = this.value;
+                document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
+            }
             if (angle > 0) { // Uphill (left side lower)
                 pileupLeft.style.bottom = '0';
                 pileupRight.style.bottom = `${angle * 0.5}px`;
@@ -779,6 +846,81 @@
         const simulationView = document.querySelector('.simulation-view');
         const simDistanceValue = document.getElementById('simDistanceValue');
         const distanceIndicator = document.getElementById('distanceIndicator');
+        // Add this with your other event listeners
+        function removeRainEffect() {
+            const rainContainer = document.querySelector('.rain-container');
+            if (rainContainer) {
+                rainContainer.remove();
+            }
+            // Remove the style element we added
+            const rainStyle = document.querySelector('style[data-rain-style]');
+            if (rainStyle) {
+                rainStyle.remove();
+            }
+        }
+        weatherToggle.addEventListener('change', function() {
+            if (this.checked) {
+                weatherValue.textContent = "Rainy";
+                simulationView.style.background = "linear-gradient(to bottom, #6D7B8D, #B0C4DE)";
+                // Add rain animation elements
+                addRainEffect();
+            } else {
+                weatherValue.textContent = "Sunny";
+                simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
+                // Remove rain animation
+                removeRainEffect();
+            }
+        });
+        // Add these helper functions
+        function addRainEffect() {
+            // Remove any existing rain
+            removeRainEffect();
+            
+            // Create rain container
+            const rainContainer = document.createElement('div');
+            rainContainer.className = 'rain-container';
+            rainContainer.style.position = 'absolute';
+            rainContainer.style.width = '100%';
+            rainContainer.style.height = '100%';
+            rainContainer.style.pointerEvents = 'none';
+            rainContainer.style.zIndex = '4';
+            rainContainer.style.overflow = 'hidden';
+            
+            // Create rain drops
+            for (let i = 0; i < 200; i++) {
+                const rainDrop = document.createElement('div');
+                rainDrop.className = 'rain-drop';
+                rainDrop.style.position = 'absolute';
+                rainDrop.style.width = '2px';
+                rainDrop.style.height = `${15 + Math.random() * 15}px`; // Varying lengths
+                rainDrop.style.backgroundColor = 'rgba(120, 150, 200, 0.7)';
+                rainDrop.style.left = `${Math.random() * 100}%`;
+                rainDrop.style.top = `${-20 - Math.random() * 20}%`; // Start above the container
+                rainDrop.style.animation = `rain-fall ${0.5 + Math.random() * 0.5}s linear infinite`;
+                rainDrop.style.animationDelay = `${Math.random() * 0.5}s`; // Shorter delay
+                rainContainer.appendChild(rainDrop);
+            }
+            
+            simulationView.appendChild(rainContainer);
+            
+            // Add CSS for rain animation
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes rain-fall {
+                    0% {
+                        transform: translateY(0);
+                    }
+                    100% {
+                        transform: translateY(calc(100vh + 20px));
+                    }
+                }
+                .rain-drop {
+                    opacity: 0.7;
+                    filter: blur(0.5px);  // Adds slight blur for wetter look
+                }
+            `;
+            document.head.appendChild(style);
+        }
         let animationFrame = null;
         let isRunning = false;
         let isPaused = false;
@@ -1013,6 +1155,33 @@
                     }
                 }
             }
+        });
+        // Set all toggles to OFF when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure road starts flat (0°)
+            document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
+            
+            // Incline (OFF)
+            inclineToggle.checked = false;
+            inclineSlider.disabled = true;
+            inclineValue.style.opacity = '0.5';
+            inclineSliderWrapper.classList.add('disabled');
+            
+            // Distance (OFF)
+            distanceToggle.checked = false;
+            distanceSlider.disabled = true;
+            distanceValue.style.opacity = '0.5';
+            distanceSliderWrapper.classList.add('disabled');
+            
+            // Weather (OFF - Sunny)
+            weatherToggle.checked = false;
+            weatherValue.textContent = "Sunny";
+            simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
+            
+            // Road Surface (OFF - Concrete)
+            roadSurfaceToggle.checked = false;
+            roadSurfaceValue.textContent = "Concrete";
+            document.querySelector('.road').style.background = "#8B7355";
         });
     </script>
 </body>
