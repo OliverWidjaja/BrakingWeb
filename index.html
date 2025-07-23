@@ -495,54 +495,6 @@
             margin: 3px;
             border-radius: 2px;
         }
-
-        .snow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 3;
-            overflow: hidden;
-        }
-
-        .snowflake {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: falling linear infinite;
-            filter: blur(1px);
-        }
-
-        @keyframes falling {
-            0% {
-                transform: translateY(-10px) translateX(0);
-            }
-            100% {
-                transform: translateY(calc(100vh + 10px)) translateX(calc(var(--random-x) * 100px));
-            }
-        }
-
-        .snow-pileup {
-            position: absolute;
-            bottom: 0;
-            height: 0;
-            width: 100%;
-            background: linear-gradient(to top, #e6f7ff, #ffffff);
-            border-radius: 50% 50% 0 0;
-            z-index: 1;
-            transition: height 0.5s ease;
-        }
-
-        .snow-pileup-left {
-            left: -10%;
-            width: 60%;
-        }
-
-        .snow-pileup-right {
-            right: -10%;
-            width: 60%;
-        }
         
         /* Responsive adjustments */
         @media (max-width: 992px) {
@@ -589,25 +541,6 @@
                     </div>
                     
                     <div class="slider-container">
-                        <div class="slider-group">
-                            <div class="parameter-header">
-                                <span class="parameter-title">
-                                    <i class="fas fa-snowflake parameter-icon"></i>
-                                    Snow Depth
-                                </span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="snowToggle" checked>
-                                    <span class="slider-switch"></span>
-                                </label>
-                            </div>
-                            <div class="slider-wrapper" id="snowSliderWrapper">
-                                <div class="slider-track"></div>
-                                <div class="slider-fill" id="snowSliderFill"></div>
-                                <input type="range" min="0" max="100" value="50" class="slider" id="snowSlider">
-                            </div>
-                            <div class="slider-value" id="snowValue">50 cm</div>
-                        </div>
-                        
                         <div class="slider-group">
                             <div class="parameter-header">
                                 <span class="parameter-title">
@@ -663,11 +596,8 @@
                         </div>
                     </div>
                     <div class="simulation-view">
-                        <div class="snow" id="snowEffect" style="display: none;"></div>
                         <div class="road">
                             <div class="lane-markers"></div>
-                            <div class="snow-pileup snow-pileup-left" id="snowPileupLeft"></div>
-                            <div class="snow-pileup snow-pileup-right" id="snowPileupRight"></div>
                             <div class="car car-front">A</div>
                             <div class="car car-rear">B</div>
                             <div class="distance-indicator" id="distanceIndicator">
@@ -768,128 +698,6 @@
 
     <script>
         // Driving condition sliders
-        const snowToggle = document.getElementById('snowToggle');
-        const snowSlider = document.getElementById('snowSlider');
-        const snowValue = document.getElementById('snowValue');
-        const snowSliderFill = document.getElementById('snowSliderFill');
-        const snowSliderWrapper = document.getElementById('snowSliderWrapper');
-        // Snow pileup functionality
-        function updateSnowPileups() {
-            if (!snowToggle.checked) {
-                document.getElementById('snowPileupLeft').style.height = '0';
-                document.getElementById('snowPileupRight').style.height = '0';
-                return;
-            }
-
-            const snowDepth = parseInt(snowSlider.value);
-            const maxHeight = 50; // Maximum snow pileup height in pixels
-            
-            // Calculate height based on snow depth (0-100 maps to 0-maxHeight)
-            const height = (snowDepth / 100) * maxHeight;
-            
-            // Update main pileups
-            document.getElementById('snowPileupLeft').style.height = `${height}px`;
-            document.getElementById('snowPileupRight').style.height = `${height}px`;
-        }
-
-        // Update snow slider event listener to include pileups
-        snowSlider.addEventListener('input', function() {
-            snowValue.textContent = this.value + ' cm';
-            updateSnowSliderFill();
-            updateSnowPileups();
-        });
-
-        // Update snow toggle event listener to include pileups
-        snowToggle.addEventListener('change', function() {
-            if (this.checked) {
-                snowSlider.disabled = false;
-                snowValue.style.opacity = '1';
-                snowSliderWrapper.classList.remove('disabled');
-                createSnowflakes();
-            } else {
-                snowSlider.disabled = true;
-                snowValue.style.opacity = '0.5';
-                snowSliderWrapper.classList.add('disabled');
-                document.getElementById('snowEffect').style.display = 'none';
-            }
-            updateSnowPileups();
-        });
-
-        // Initialize snow pileups on load
-        updateSnowPileups();
-        function updateSnowSliderFill() {
-            const value = snowSlider.value;
-            const max = snowSlider.max;
-            const percent = (value / max) * 100;
-            snowSliderFill.style.width = `${percent}%`;
-        }
-        function createSnowflakes() {
-            const snowEffect = document.getElementById('snowEffect');
-            snowEffect.innerHTML = '';
-            snowEffect.style.display = 'block';
-            
-            // Create 100 snowflakes
-            for (let i = 0; i < 100; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.classList.add('snowflake');
-                
-                // Random size between 2px and 6px
-                const size = Math.random() * 4 + 2;
-                snowflake.style.width = `${size}px`;
-                snowflake.style.height = `${size}px`;
-                
-                // Random position
-                snowflake.style.left = `${Math.random() * 100}%`;
-                snowflake.style.top = `${Math.random() * 100}%`;
-                
-                // Random animation duration between 5s and 15s
-                const duration = Math.random() * 10 + 5;
-                snowflake.style.animationDuration = `${duration}s`;
-                
-                // Random x movement
-                snowflake.style.setProperty('--random-x', Math.random() * 2 - 1);
-                
-                // Random opacity
-                snowflake.style.opacity = Math.random() * 0.5 + 0.3;
-                
-                snowEffect.appendChild(snowflake);
-            }
-        }
-
-        function toggleSnowEffect() {
-            const snowEffect = document.getElementById('snowEffect');
-            if (snowToggle.checked) {
-                createSnowflakes();
-            } else {
-                snowEffect.style.display = 'none';
-            }
-        }
-
-        // Initialize snow effect
-        snowToggle.addEventListener('change', toggleSnowEffect);
-
-        // Also update snow effect when window resizes
-        window.addEventListener('resize', function() {
-            if (snowToggle.checked) {
-                createSnowflakes();
-            }
-        });
-        snowToggle.addEventListener('change', function() {
-            if (this.checked) {
-                snowSlider.disabled = false;
-                snowValue.style.opacity = '1';
-                snowSliderWrapper.classList.remove('disabled');
-            } else {
-                snowSlider.disabled = true;
-                snowValue.style.opacity = '0.5';
-                snowSliderWrapper.classList.add('disabled');
-            }
-        });
-        snowSlider.addEventListener('input', function() {
-            snowValue.textContent = this.value + ' cm';
-            updateSnowSliderFill();
-        });
-        updateSnowSliderFill();
         const inclineToggle = document.getElementById('inclineToggle');
         const inclineSlider = document.getElementById('inclineSlider');
         const inclineValue = document.getElementById('inclineValue');
@@ -920,16 +728,6 @@
             const angle = this.value;
             const road = document.querySelector('.road');
             road.style.transform = `translateY(-50%) rotate(${-angle}deg)`;
-            
-            // Update snow angle if visible
-            if (snowToggle.checked) {
-                const snowEffect = document.getElementById('snowEffect');
-                snowEffect.style.transform = `rotate(${angle}deg)`;
-            }
-            
-            // Adjust snow pileups for incline
-            const pileupLeft = document.getElementById('snowPileupLeft');
-            const pileupRight = document.getElementById('snowPileupRight');
             
             if (angle > 0) { // Uphill (left side lower)
                 pileupLeft.style.bottom = '0';
