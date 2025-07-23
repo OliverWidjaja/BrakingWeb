@@ -749,7 +749,7 @@
                             <div class="slider-wrapper" id="distanceSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="distanceSliderFill"></div>
-                                <input type="range" min="1" max="100" value="" class="slider" id="distanceSlider">
+                                <input type="range" min="1" max="100" value="20" class="slider" id="distanceSlider">
                             </div>
                             <div class="slider-value" id="distanceValue">20 m</div>
                         </div>
@@ -966,10 +966,16 @@
                 distanceSliderWrapper.classList.add('disabled');
             }
         });
+        // Update the distance slider event listener to smoothly update positions
         distanceSlider.addEventListener('input', function() {
             const distance = this.value;
             distanceValue.textContent = distance + ' m';
             updateDistanceSliderFill();
+            
+            // Only update position if simulation isn't running
+            if (!isRunning) {
+                updateCarSimulation();
+            }
         });
         updateDistanceSliderFill();
 
@@ -1128,22 +1134,34 @@
         let currentPos = null;
         let stopPos = null;
         let duration = 2000;
+        // Update the updateCarSimulation function to properly handle distances
         function updateCarSimulation(positionB = null) {
             const distance = parseInt(distanceSlider.value);
             const simulationWidth = simulationView.offsetWidth;
-            const carWidth = 80;
-            const carFrontPos = simulationWidth * 0.3;
+            const carWidth = 80; // Width of the car in pixels
+            const carFrontPos = simulationWidth * 0.7; // Fixed position for Car A
+            
+            // Calculate pixel distance (3 pixels per meter)
+            const pixelDistance = distance * 3;
+            
+            // Calculate Car B position based on distance
             let carRearPos;
             if (positionB !== null) {
                 carRearPos = positionB;
             } else {
-                carRearPos = carFrontPos - (distance * 3);
+                carRearPos = carFrontPos - pixelDistance - carWidth;
+                // Ensure Car B doesn't go off the left edge
                 if (carRearPos < 20) carRearPos = 20;
             }
+            
+            // Update car positions
             carFront.style.left = `${carFrontPos}px`;
             carRear.style.left = `${carRearPos}px`;
+            
+            // Update distance indicator
             const indicatorLeft = carRearPos + carWidth;
             const indicatorWidth = carFrontPos - indicatorLeft;
+            
             if (indicatorWidth > 0) {
                 distanceIndicator.style.left = `${indicatorLeft}px`;
                 distanceIndicator.style.width = `${indicatorWidth}px`;
@@ -1152,13 +1170,16 @@
             } else {
                 distanceIndicator.style.display = 'none';
             }
-            stopPos = carFrontPos - (distance * 3);
+            
+            // Update stop position for animation
+            stopPos = carFrontPos - pixelDistance - carWidth;
             if (stopPos < 20) stopPos = 20;
         }
+
         function animateCarRear(timestamp) {
             if (!startTime) startTime = timestamp;
             const simulationWidth = simulationView.offsetWidth;
-            const carFrontPos = simulationWidth * 0.3;
+            const carFrontPos = simulationWidth * 0.7;
             const startCarB = 20;
             const endCarB = stopPos;
             const progress = Math.min((timestamp - startTime) / duration, 1);
@@ -1376,6 +1397,8 @@
             roadSurfaceToggle.checked = false;
             roadSurfaceValue.textContent = "Concrete";
             document.querySelector('.road').style.background = "#8B7355";
+
+            resetAllSettings();
         });
         
         function resetAllSettings() {
@@ -1389,7 +1412,7 @@
             distanceSlider.value = 20;
             distanceValue.textContent = "20 m";
             updateDistanceSliderFill();
-            updateCarSimulation(20); // Reset car positions
+            updateCarSimulation(); // Reset car positions
             
             // Reset weather elements
             weatherToggle.checked = false;
