@@ -149,6 +149,7 @@
             background: linear-gradient(90deg, #006699, #00cc99);
             border-radius: 5px;
             top: 6px;
+
         }
         .slider {
             width: 100%;
@@ -358,6 +359,41 @@
             align-items: center;
             transition: transform 0.5s ease;
             z-index: 2;
+        }
+        /* Special styling for incline slider */
+        .incline-slider-wrapper {
+            position: relative;
+        }
+
+        .incline-slider-fill {
+            position: absolute;
+            height: 10px;
+            top: 6px;
+            border-radius: 5px;
+            /* Center the fill at 0 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            /* Different gradient for negative/positive values */
+            background: linear-gradient(90deg, 
+                #ff3333 0%,    /* Red for negative */
+                #006699 50%,   /* Blue at center (0) */
+                #00cc99 100%   /* Green for positive */
+            );
+        }
+
+        /* Left fill (negative values) */
+        .incline-slider-fill.negative {
+            left: 50%;
+            transform: translateX(-100%);
+            background: #ff3333;
+        }
+
+        /* Right fill (positive values) */
+        .incline-slider-fill.positive {
+            left: 50%;
+            transform: none;
+            background: #00cc99;
         }
         .lane-markers {
             position: absolute;
@@ -677,10 +713,10 @@
                                     Incline Angle
                                 </span>
                             </div>
-                            <div class="slider-wrapper">
+                            <div class="slider-wrapper incline-slider-wrapper">
                                 <div class="slider-track"></div>
-                                <div class="slider-fill" id="inclineSliderFill"></div>
-                                <input type="range" min="0" max="5" value="0" class="slider" id="inclineSlider">
+                                <div class="slider-fill incline-slider-fill" id="inclineSliderFill"></div>
+                                <input type="range" min="-5" max="5" value="0" class="slider" id="inclineSlider">
                             </div>
                             <div class="slider-value" id="inclineValue">0°</div>
                         </div>
@@ -861,11 +897,26 @@
         const inclineSliderFill = document.getElementById('inclineSliderFill');
         const inclineSliderWrapper = document.getElementById('inclineSliderWrapper');
 
+        // Update the slider fill calculation to handle negative range
         function updateInclineSliderFill() {
-            const value = inclineSlider.value;
-            const max = inclineSlider.max;
-            const percent = (value / max) * 100;
-            inclineSliderFill.style.width = `${percent}%`;
+            const value = parseInt(inclineSlider.value);
+            const fill = document.getElementById('inclineSliderFill');
+            
+            // Reset classes
+            fill.classList.remove('negative', 'positive');
+            
+            if (value < 0) {
+                // Negative values (left side only)
+                fill.classList.add('negative');
+                fill.style.width = `${(Math.abs(value) / 5) * 50}%`;
+            } else if (value > 0) {
+                // Positive values (right side only)
+                fill.classList.add('positive');
+                fill.style.width = `${(value / 5) * 50}%`;
+            } else {
+                // Zero value
+                fill.style.width = '0%';
+            }
         }
         // Initialize road to 0°
         document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
@@ -1378,10 +1429,20 @@
         // Call this on page load
         document.addEventListener('DOMContentLoaded', resetAllSettings);
 
+        // Update on slider input
+        inclineSlider.addEventListener('input', function() {
+            const angle = this.value;
+            inclineValue.textContent = angle + '°';
+            updateInclineSliderFill();
+            document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
+        });
+
         // Optional: Also reset when restart button is clicked
         simRestartBtn.addEventListener('click', function() {
             resetAllSettings();
         });
+
+        
     </script>
 </body>
 </html>
