@@ -590,12 +590,8 @@
                                     <i class="fas fa-mountain parameter-icon"></i>
                                     Incline Angle
                                 </span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="inclineToggle" checked>
-                                    <span class="slider-switch"></span>
-                                </label>
                             </div>
-                            <div class="slider-wrapper" id="inclineSliderWrapper">
+                            <div class="slider-wrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="inclineSliderFill"></div>
                                 <input type="range" min="0" max="5" value="0" class="slider" id="inclineSlider">
@@ -610,14 +606,14 @@
                                     Distance Between Cars
                                 </span>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="distanceToggle" checked>
+                                    <input type="checkbox" id="distanceToggle">
                                     <span class="slider-switch"></span>
                                 </label>
                             </div>
                             <div class="slider-wrapper" id="distanceSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="distanceSliderFill"></div>
-                                <input type="range" min="1" max="100" value="20" class="slider" id="distanceSlider">
+                                <input type="range" min="1" max="100" value="" class="slider" id="distanceSlider">
                             </div>
                             <div class="slider-value" id="distanceValue">20 m</div>
                         </div>
@@ -757,57 +753,42 @@
         });
         roadElement.style.background = "#4d4d4d";
         // incline  sliders
-        const inclineToggle = document.getElementById('inclineToggle');
         const inclineSlider = document.getElementById('inclineSlider');
-        const inclineValue = document.getElementById('inclineValue');
         const inclineSliderFill = document.getElementById('inclineSliderFill');
         const inclineSliderWrapper = document.getElementById('inclineSliderWrapper');
+
         function updateInclineSliderFill() {
             const value = inclineSlider.value;
             const max = inclineSlider.max;
             const percent = (value / max) * 100;
             inclineSliderFill.style.width = `${percent}%`;
         }
-        inclineToggle.addEventListener('change', function() {
-            if (this.checked) {
-                inclineSlider.disabled = false;
-                inclineValue.style.opacity = '1';
-                inclineSliderWrapper.classList.remove('disabled');
-                // Apply current slider value to road
-                const angle = inclineSlider.value;
-                document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
-            } else {
-                inclineSlider.disabled = true;
-                inclineValue.style.opacity = '0.5';
-                inclineSliderWrapper.classList.add('disabled');
-                document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
-            }
-        });
+        // Initialize road to 0°
+        document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
+
         inclineSlider.addEventListener('input', function() {
-            inclineValue.textContent = this.value + '°';
+            const angle = this.value;
+            inclineValue.textContent = angle + '°';
             updateInclineSliderFill();
             
             // Update road angle
-            const angle = this.value;
-            const road = document.querySelector('.road');
-            road.style.transform = `translateY(-50%) rotate(${-angle}deg)`;
-            // Only update road angle if toggle is on
-            if (inclineToggle.checked) {
-                const angle = this.value;
-                document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
-            }
-            if (angle > 0) { // Uphill (left side lower)
+            document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
+            
+            // Update pileup positioning if you have that feature
+            if (angle > 0) {
                 pileupLeft.style.bottom = '0';
                 pileupRight.style.bottom = `${angle * 0.5}px`;
-            } else if (angle < 0) { // Downhill (right side lower)
+            } else if (angle < 0) {
                 pileupLeft.style.bottom = `${Math.abs(angle) * 0.5}px`;
                 pileupRight.style.bottom = '0';
-            } else { // Flat
+            } else {
                 pileupLeft.style.bottom = '0';
                 pileupRight.style.bottom = '0';
             }
         });
+
         updateInclineSliderFill();
+
         const distanceToggle = document.getElementById('distanceToggle');
         const distanceSlider = document.getElementById('distanceSlider');
         const distanceValue = document.getElementById('distanceValue');
@@ -1161,12 +1142,6 @@
             // Ensure road starts flat (0°)
             document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             
-            // Incline (OFF)
-            inclineToggle.checked = false;
-            inclineSlider.disabled = true;
-            inclineValue.style.opacity = '0.5';
-            inclineSliderWrapper.classList.add('disabled');
-            
             // Distance (OFF)
             distanceToggle.checked = false;
             distanceSlider.disabled = true;
@@ -1182,6 +1157,54 @@
             roadSurfaceToggle.checked = false;
             roadSurfaceValue.textContent = "Concrete";
             document.querySelector('.road').style.background = "#8B7355";
+        });
+        
+        function resetAllSettings() {
+            // Reset incline angle
+            inclineSlider.value = 0;
+            inclineValue.textContent = "0°";
+            updateInclineSliderFill();
+            document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
+            
+            // Reset distance
+            distanceSlider.value = 20;
+            distanceValue.textContent = "20 m";
+            updateDistanceSliderFill();
+            updateCarSimulation(20); // Reset car positions
+            
+            // Reset weather
+            weatherToggle.checked = false;
+            weatherValue.textContent = "Sunny";
+            simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
+            removeRainEffect();
+            
+            // Reset road surface
+            roadSurfaceToggle.checked = false;
+            roadSurfaceValue.textContent = "Concrete";
+            document.querySelector('.road').style.background = "#8B7355";
+            
+            // Reset simulation state
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            isRunning = false;
+            isPaused = false;
+            simStartBtn.disabled = false;
+            simStopBtn.disabled = true;
+            
+            // Reset charts if needed
+            speedChart.data.datasets[0].data = [0, 25, 45, 60, 45, 30];
+            accelerationChart.data.datasets[0].data = [0, 15, 30, 40, 25, 10];
+            inertiaChart.data.datasets[0].data = [10, 45, 70, 85, 60, 30];
+            speedChart.update();
+            accelerationChart.update();
+            inertiaChart.update();
+        }
+
+        // Call this on page load
+        document.addEventListener('DOMContentLoaded', resetAllSettings);
+
+        // Optional: Also reset when restart button is clicked
+        simRestartBtn.addEventListener('click', function() {
+            resetAllSettings();
         });
     </script>
 </body>
