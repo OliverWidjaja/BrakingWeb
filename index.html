@@ -1134,7 +1134,17 @@
         let currentPos = null;
         let stopPos = null;
         let duration = 2000;
-        // Update the updateCarSimulation function to properly handle distances
+        let maxDistancePosition = null;
+
+        // Add this helper function to calculate distance between cars
+        function calculateRealDistance(carAPos, carBPos, carWidth) {
+            // Distance in pixels is (carA left) - (carB left + carB width)
+            const pixelDistance = carAPos - (carBPos + carWidth);
+            // Convert pixels to meters (3 pixels = 1 meter in our simulation)
+            return Math.max(0, Math.round(pixelDistance / 3));
+        }
+
+        // Update the updateCarSimulation function
         function updateCarSimulation(positionB = null) {
             const distance = parseInt(distanceSlider.value);
             const simulationWidth = simulationView.offsetWidth;
@@ -1154,19 +1164,29 @@
                 if (carRearPos < 20) carRearPos = 20;
             }
             
+            // Calculate position for maximum distance (101m)
+            const maxPixelDistance = 101 * 3;
+            maxDistancePosition = carFrontPos - maxPixelDistance - carWidth;
+            if (maxDistancePosition < 20) maxDistancePosition = 20;
+            
             // Update car positions
             carFront.style.left = `${carFrontPos}px`;
             carRear.style.left = `${carRearPos}px`;
             
-            // Update distance indicator
+            // Calculate real distance between cars
+            const realDistance = calculateRealDistance(carFrontPos, carRearPos, carWidth);
+            
+            // Update distance indicator - only show if Car B has passed max distance position
             const indicatorLeft = carRearPos + carWidth;
             const indicatorWidth = carFrontPos - indicatorLeft;
             
-            if (indicatorWidth > 0) {
+            if (indicatorWidth > 0 && carRearPos > maxDistancePosition) {
                 distanceIndicator.style.left = `${indicatorLeft}px`;
                 distanceIndicator.style.width = `${indicatorWidth}px`;
                 distanceIndicator.style.display = 'flex';
-                simDistanceValue.textContent = `${distance} m`;
+                
+                // Show either the real distance (during simulation) or slider value (when static)
+                simDistanceValue.textContent = isRunning ? `${realDistance} m` : `${distance} m`;
             } else {
                 distanceIndicator.style.display = 'none';
             }
@@ -1174,24 +1194,39 @@
             // Update stop position for animation
             stopPos = carFrontPos - pixelDistance - carWidth;
             if (stopPos < 20) stopPos = 20;
+            
+            return realDistance; // Return the calculated distance
         }
 
+        // Update the animateCarRear function
         function animateCarRear(timestamp) {
             if (!startTime) startTime = timestamp;
             const simulationWidth = simulationView.offsetWidth;
             const carFrontPos = simulationWidth * 0.7;
-            const startCarB = 20;
+            const startCarB = 10;
             const endCarB = stopPos;
             const progress = Math.min((timestamp - startTime) / duration, 1);
             const eased = 0.5 - 0.5 * Math.cos(Math.PI * progress);
             currentPos = startCarB + eased * (endCarB - startCarB);
-            updateCarSimulation(currentPos);
+            const realDistance = updateCarSimulation(currentPos);
+            
+            // Only show indicator if Car B has passed the max distance position
+            if (currentPos > maxDistancePosition) {
+                distanceIndicator.style.display = 'flex';
+                // Update with real distance during animation
+                simDistanceValue.textContent = `${realDistance} m`;
+            } else {
+                distanceIndicator.style.display = 'none';
+            }
+            
             if (progress < 1 && isRunning && !isPaused) {
                 animationFrame = requestAnimationFrame(animateCarRear);
             } else {
                 isRunning = false;
                 simStartBtn.disabled = false;
                 simStopBtn.disabled = true;
+                // When animation stops, show the slider value again
+                updateCarSimulation();
             }
         }
         simStartBtn.addEventListener('click', () => {
@@ -1220,8 +1255,15 @@
             if (animationFrame) cancelAnimationFrame(animationFrame);
             updateCarSimulation(20);
         });
-        distanceSlider.addEventListener('input', () => {
-            if (!isRunning) updateCarSimulation();
+        distanceSlider.addEventListener('input', function() {
+            const distance = this.value;
+            distanceValue.textContent = distance + ' m';
+            updateDistanceSliderFill();
+            
+            // Only update position if simulation isn't running
+            if (!isRunning) {
+                updateCarSimulation();
+            }
         });
         window.addEventListener('resize', () => {
             if (!isRunning) updateCarSimulation();
@@ -1377,11 +1419,16 @@
                 }
             }
         });
+
+        //money
+
         // Set all toggles to OFF when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Ensure road starts flat (0°)
             document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             
+            updateCarSimulation();
+
             // Distance (OFF)
             distanceToggle.checked = false;
             distanceSlider.disabled = true;
