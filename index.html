@@ -515,6 +515,55 @@
         .car-rear::before, .car-rear::after {
             background: #003366;
         }
+        /* Add this to your CSS section */
+        .warning-arcs {
+            position: absolute;
+            pointer-events: none;
+            z-index: 3;
+            display: none;
+        }
+
+        .warning-arc {
+            position: absolute;
+            border: 3px solid;
+            border-color: transparent transparent transparent;
+            border-radius: 50%;
+            transform-origin: left center;
+            transform: rotate(180deg);
+        }
+
+        .warning-arc.inner {
+            width: 60px;
+            height: 60px;
+            left: 78px; /* Car width */
+            top: -55px;
+            border-color: transparent transparent transparent #ff3333;
+            animation: pulse 1.5s infinite;
+        }
+
+        .warning-arc.middle {
+            width: 90px;
+            height: 90px;
+            left: 90px;
+            top: -70px;
+            border-color: transparent transparent transparent #ff9933;
+            animation: pulse 1.5s infinite;
+        }
+
+        .warning-arc.outer {
+            width: 120px;
+            height: 120px;
+            left: 100px;
+            top: -85px;
+            border-color: transparent transparent transparent #ffcc33;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
         .distance-indicator {
             position: absolute;
             height: 3px;
@@ -901,6 +950,11 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="warning-arcs" id="warningArcs">
+                            <div class="warning-arc inner"></div>
+                            <div class="warning-arc middle"></div>
+                            <div class="warning-arc outer"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1220,39 +1274,50 @@
             return Math.max(0, Math.round(pixelDistance / 3));
         }
 
-        // Update the updateCarSimulation function
+        const warningArcs = document.getElementById('warningArcs');
+        let showWarningArcs = false;
+
+        // Modify the updateCarSimulation function to include warning arc logic
         function updateCarSimulation(positionB = null) {
             const distance = parseInt(distanceSlider.value);
             const simulationWidth = simulationView.offsetWidth;
-            const carWidth = 80; // Width of the car in pixels
-            const carFrontPos = simulationWidth * 0.7; // Fixed position for Car A
+            const carWidth = 80;
+            const carFrontPos = simulationWidth * 0.7;
             
-            // Calculate pixel distance (3 pixels per meter)
             const pixelDistance = distance * 3;
             
-            // Calculate Car B position based on distance
             let carRearPos;
             if (positionB !== null) {
                 carRearPos = positionB;
             } else {
                 carRearPos = carFrontPos - pixelDistance - carWidth;
-                // Ensure Car B doesn't go off the left edge
                 if (carRearPos < 20) carRearPos = 20;
             }
             
-            // Calculate position for maximum distance (101m)
             const maxPixelDistance = 101 * 3;
             maxDistancePosition = carFrontPos - maxPixelDistance - carWidth;
             if (maxDistancePosition < 20) maxDistancePosition = 20;
             
-            // Update car positions
             carFront.style.left = `${carFrontPos}px`;
             carRear.style.left = `${carRearPos}px`;
             
-            // Calculate real distance between cars
             const realDistance = calculateRealDistance(carFrontPos, carRearPos, carWidth);
             
-            // Update distance indicator - only show if Car B has passed max distance position
+            // Show/hide warning arcs based on distance
+            if (realDistance <= 100 && !showWarningArcs) {
+                warningArcs.style.display = 'block';
+                showWarningArcs = true;
+            } else if (realDistance > 100 && showWarningArcs) {
+                warningArcs.style.display = 'none';
+                showWarningArcs = false;
+            }
+            
+            // Position the warning arcs relative to Car B
+            if (showWarningArcs) {
+                warningArcs.style.left = `${carRearPos}px`;
+            }
+            
+            // Rest of your existing function...
             const indicatorLeft = carRearPos + carWidth;
             const indicatorWidth = carFrontPos - indicatorLeft;
             
@@ -1260,18 +1325,15 @@
                 distanceIndicator.style.left = `${indicatorLeft}px`;
                 distanceIndicator.style.width = `${indicatorWidth}px`;
                 distanceIndicator.style.display = 'flex';
-                
-                // Show either the real distance (during simulation) or slider value (when static)
                 simDistanceValue.textContent = isRunning ? `${realDistance} m` : `${distance} m`;
             } else {
                 distanceIndicator.style.display = 'none';
             }
             
-            // Update stop position for animation
             stopPos = carFrontPos - pixelDistance - carWidth;
             if (stopPos < 20) stopPos = 20;
             
-            return realDistance; // Return the calculated distance
+            return realDistance;
         }
 
         // Update the animateCarRear function
@@ -1536,6 +1598,10 @@
             distanceValue.textContent = "20 m";
             updateDistanceSliderFill();
             updateCarSimulation(); // Reset car positions
+            
+            // Hide warning arcs
+            warningArcs.style.display = 'none';
+            showWarningArcs = false;
             
             // Reset weather elements
             weatherToggle.checked = false;
