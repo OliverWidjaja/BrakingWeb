@@ -515,6 +515,23 @@
         .car-rear::before, .car-rear::after {
             background: #003366;
         }
+        .car-rear-light {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ff3333;
+            border-radius: 20%;
+            left: 5px;
+            top: 40%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 0 5px #ff3333;
+        }
+
+        .car-rear.lights-on .car-rear-light {
+            opacity: 1;
+        }
         .warning-arcs {
             position: absolute;
             pointer-events: none;
@@ -913,7 +930,9 @@
                         <div class="road">
                             <div class="lane-markers"></div>
                             <div class="car car-front">A</div>
-                            <div class="car car-rear">B</div>
+                            <div class="car car-rear">B
+                                <div class="car-rear-light"></div>
+                            </div>
                             <div class="distance-indicator" id="distanceIndicator">
                                 <span class="distance-value" id="simDistanceValue">20 m</span>
                             </div>
@@ -1359,6 +1378,14 @@
             
             stopPos = carFrontPos - pixelDistance - carWidth;
             if (stopPos < 20) stopPos = 20;
+
+            // Check if we've passed the 100m mark (maxDistancePosition)
+            if (positionB !== null && positionB > maxDistancePosition) {
+                carRear.classList.add('lights-on');
+            } else {
+                carRear.classList.remove('lights-on');
+            }
+            
             
             return realDistance;
         }
@@ -1646,6 +1673,8 @@
             massValue.textContent = "0x";
             updateMassSliderFill();
             updateCarMass();
+
+            carRear.classList.remove('lights-on');
                     
             // Reset road surface
             roadSurfaceToggle.checked = false;
