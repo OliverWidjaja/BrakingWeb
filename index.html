@@ -345,6 +345,74 @@
             justify-content: center;
             border: 1px solid rgba(0, 102, 153, 0.2);
         }
+        /* Traffic light with pole behind */
+        .traffic-light-container {
+            position: absolute;
+            left: 80%;
+            transform: translateX(-50%);
+            top: 26.5%;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .traffic-light {
+            width: 30px;
+            height: 80px;
+            background: #333;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 5px 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 4; /* Ensure light is above pole */
+        }
+
+        .traffic-light-pole {
+            width: 10px;
+            height: 50px;
+            background: linear-gradient(to bottom, #555, #333);
+            position: absolute;
+            top: 80px; /* Start at bottom of traffic light */
+            z-index: 1; /* Behind the traffic light */
+        }
+
+        .light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #444;
+            position: relative;
+        }
+
+        .light::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .light.red::after {
+            color: #ff3333;
+            opacity: 1;
+            box-shadow: 0 0 10px #ff3333;
+        }
+
+        .light.yellow::after {
+            color: #ffff33;
+        }
+
+        .light.green::after {
+            color: #33ff33;
+        }
         .road {
             position: absolute;
             width: 100%;
@@ -774,6 +842,14 @@
                         <div class="weather-elements">
                             <div class="sun"></div>
                             <div class="clouds"></div>
+                        </div>
+                        <div class="traffic-light-container">
+                            <div class="traffic-light">
+                                <div class="light red"></div>
+                                <div class="light yellow"></div>
+                                <div class="light green"></div>
+                            </div>
+                            <div class="traffic-light-pole"></div>
                         </div>
                         <div class="road">
                             <div class="lane-markers"></div>
