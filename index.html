@@ -568,7 +568,7 @@
             position: absolute;
             height: 3px;
             background: #006699;
-            bottom: 55%;
+            bottom: 50%;
             z-index: 3;
             display: flex;
             align-items: center;
@@ -584,6 +584,16 @@
             font-weight: bold;
             top: -18px;
             white-space: nowrap;
+        }
+        .distance-traveled {
+            background: rgba(255, 165, 0, 0.9);
+            bottom: 50%;
+            z-index: 2;
+        }
+
+        .distance-traveled .distance-value {
+            background: rgba(255, 165, 0, 0.9);
+            top: -18px;
         }
         .road-surface-state {
             display: block;
@@ -955,6 +965,9 @@
                             <div class="warning-arc middle"></div>
                             <div class="warning-arc outer"></div>
                         </div>
+                        <div class="distance-indicator distance-traveled" id="distanceTraveledIndicator">
+                            <span class="distance-value" id="distanceTraveledValue">0 m</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1277,6 +1290,9 @@
         const warningArcs = document.getElementById('warningArcs');
         let showWarningArcs = false;
 
+        const distanceTraveledValue = document.getElementById('distanceTraveledValue');
+        const distanceTraveledIndicator = document.getElementById('distanceTraveledIndicator');
+
         // Modify the updateCarSimulation function to include warning arc logic
         function updateCarSimulation(positionB = null) {
             const distance = parseInt(distanceSlider.value);
@@ -1317,7 +1333,7 @@
                 warningArcs.style.left = `${carRearPos}px`;
             }
             
-            // Rest of your existing function...
+            // Update original distance indicator (blue)
             const indicatorLeft = carRearPos + carWidth;
             const indicatorWidth = carFrontPos - indicatorLeft;
             
@@ -1326,8 +1342,19 @@
                 distanceIndicator.style.width = `${indicatorWidth}px`;
                 distanceIndicator.style.display = 'flex';
                 simDistanceValue.textContent = isRunning ? `${realDistance} m` : `${distance} m`;
+                
+                // Update traveled distance indicator (green)
+                const traveledDistance = 100 - realDistance;
+                const traveledIndicatorLeft = maxDistancePosition + carWidth;
+                const traveledIndicatorWidth = carRearPos - maxDistancePosition;
+                
+                distanceTraveledIndicator.style.left = `${traveledIndicatorLeft}px`;
+                distanceTraveledIndicator.style.width = `${traveledIndicatorWidth}px`;
+                distanceTraveledIndicator.style.display = 'flex';
+                distanceTraveledValue.textContent = `${traveledDistance} m`;
             } else {
                 distanceIndicator.style.display = 'none';
+                distanceTraveledIndicator.style.display = 'none';
             }
             
             stopPos = carFrontPos - pixelDistance - carWidth;
@@ -1602,6 +1629,9 @@
             // Hide warning arcs
             warningArcs.style.display = 'none';
             showWarningArcs = false;
+
+            distanceIndicator.style.display = 'none';
+            distanceTraveledIndicator.style.display = 'none';
             
             // Reset weather elements
             weatherToggle.checked = false;
