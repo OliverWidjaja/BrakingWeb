@@ -515,12 +515,12 @@
         .car-rear::before, .car-rear::after {
             background: #003366;
         }
-        /* Add this to your CSS section */
         .warning-arcs {
             position: absolute;
             pointer-events: none;
             z-index: 3;
             display: none;
+            /* Remove left positioning since we'll handle it in JS */
         }
 
         .warning-arc {
@@ -535,27 +535,27 @@
         .warning-arc.inner {
             width: 60px;
             height: 60px;
-            left: 78px; /* Car width */
+            left: 103px; /* Car width */
             top: -55px;
-            border-color: transparent transparent transparent #ff3333;
+            border-color: transparent transparent transparent #808080; /* Grey color */
             animation: pulse 1.5s infinite;
         }
 
         .warning-arc.middle {
             width: 90px;
             height: 90px;
-            left: 90px;
+            left: 115px;
             top: -70px;
-            border-color: transparent transparent transparent #ff9933;
+            border-color: transparent transparent transparent #A9A9A9; /* Darker grey */
             animation: pulse 1.5s infinite;
         }
 
         .warning-arc.outer {
             width: 120px;
             height: 120px;
-            left: 100px;
+            left: 125px;
             top: -85px;
-            border-color: transparent transparent transparent #ffcc33;
+            border-color: transparent transparent transparent #C0C0C0; /* Lighter grey */
             animation: pulse 1.5s infinite;
         }
 
