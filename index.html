@@ -725,6 +725,34 @@
             margin-top: 10px;
             transition: all 0.3s ease;
         }
+
+        .weather-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .weather-option {
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #006699;
+            background-color: rgba(0, 102, 153, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .weather-option.active {
+            background-color: #006699;
+            color: white;
+        }
+
+        .weather-divider {
+            color: #006699;
+            font-weight: bold;
+        }
         /* Responsive adjustments */
         @media (max-width: 992px) {
             .control-cards {
@@ -862,12 +890,12 @@
                                     <i class="fas fa-cloud-rain parameter-icon"></i>
                                     Weather Conditions
                                 </span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="weatherToggle">
-                                    <span class="slider-switch"></span>
-                                </label>
                             </div>
-                            <div class="weather-state" id="weatherValue">Sunny</div>
+                            <div class="weather-toggle-container">
+                                <span class="weather-option active" id="sunnyOption">Sunny</span>
+                                <span class="weather-divider">|</span>
+                                <span class="weather-option" id="rainyOption">Rainy</span>
+                            </div>
                         </div>
                         <div class="slider-group">
                             <div class="parameter-header">
@@ -875,12 +903,12 @@
                                     <i class="fas fa-road parameter-icon"></i>
                                     Road Surface
                                 </span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="roadSurfaceToggle">
-                                    <span class="slider-switch"></span>
-                                </label>
                             </div>
-                            <div class="road-surface-state" id="roadSurfaceValue">Asphalt</div>
+                            <div class="weather-toggle-container">
+                                <span class="weather-option active" id="asphaltOption">Asphalt</span>
+                                <span class="weather-divider">|</span>
+                                <span class="weather-option" id="concreteOption">Concrete</span>
+                            </div>
                         </div>
                         <div class="slider-group">
                             <div class="parameter-header">
@@ -1073,22 +1101,30 @@
     </div>
 
     <script>
-        const weatherToggle = document.getElementById('weatherToggle');
-        const weatherValue = document.getElementById('weatherValue');
-        const roadSurfaceToggle = document.getElementById('roadSurfaceToggle');
-        const roadSurfaceValue = document.getElementById('roadSurfaceValue');
+        // Road surface toggle
+        const asphaltOption = document.getElementById('asphaltOption');
+        const concreteOption = document.getElementById('concreteOption');
         const roadElement = document.querySelector('.road');
 
-        roadSurfaceToggle.addEventListener('change', function() {
-            if (this.checked) {
-                roadSurfaceValue.textContent = "Asphalt";
+        function setRoadSurface(isAsphalt) {
+            if (isAsphalt) {
+                asphaltOption.classList.add('active');
+                concreteOption.classList.remove('active');
                 roadElement.style.background = "#4d4d4d"; // Dark grey for asphalt
             } else {
-                roadSurfaceValue.textContent = "Concrete";
+                asphaltOption.classList.remove('active');
+                concreteOption.classList.add('active');
                 roadElement.style.background = "#8B7355"; // Brown for concrete
             }
-        });
-        roadElement.style.background = "#4d4d4d";
+        }
+
+        // Event listeners for the road surface toggle
+        asphaltOption.addEventListener('click', () => setRoadSurface(true));
+        concreteOption.addEventListener('click', () => setRoadSurface(false));
+
+        // Initialize to asphalt
+        setRoadSurface(true);
+
         // incline  sliders
         const inclineSlider = document.getElementById('inclineSlider');
         const inclineSliderFill = document.getElementById('inclineSliderFill');
@@ -1241,17 +1277,26 @@
                 rainStyle.remove();
             }
         }
-        weatherToggle.addEventListener('change', function() {
-            if (this.checked) {
-                weatherValue.textContent = "Rainy";
+        
+        const sunnyOption = document.getElementById('sunnyOption');
+        const rainyOption = document.getElementById('rainyOption');
+
+        function setWeather(isSunny) {
+            // Toggle active state and weather effects
+            if (isSunny) {
+                sunnyOption.classList.add('active');
+                rainyOption.classList.remove('active');
+                simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
+                document.querySelector('.sun').style.opacity = '1';
+                document.querySelector('.clouds').style.opacity = '0';
+                removeRainEffect();
+            } else {
+                sunnyOption.classList.remove('active');
+                rainyOption.classList.add('active');
                 simulationView.style.background = "linear-gradient(to bottom, #6D7B8D, #B0C4DE)";
-                
-                // Hide sun and show clouds
                 document.querySelector('.sun').style.opacity = '0';
                 const clouds = document.querySelector('.clouds');
                 clouds.style.opacity = '1';
-                
-                // Create cloud elements if they don't exist
                 if (clouds.children.length === 0) {
                     for (let i = 0; i < 4; i++) {
                         const cloud = document.createElement('div');
@@ -1259,21 +1304,17 @@
                         clouds.appendChild(cloud);
                     }
                 }
-                
-                // Add rain animation
                 addRainEffect();
-            } else {
-                weatherValue.textContent = "Sunny";
-                simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
-                
-                // Show sun and hide clouds
-                document.querySelector('.sun').style.opacity = '1';
-                document.querySelector('.clouds').style.opacity = '0';
-                
-                // Remove rain animation
-                removeRainEffect();
             }
-        });
+        }
+
+        // Event listeners for the new toggle
+        sunnyOption.addEventListener('click', () => setWeather(true));
+        rainyOption.addEventListener('click', () => setWeather(false));
+
+        // Initialize to sunny
+        setWeather(true);
+
         // Add these helper functions
         function addRainEffect() {
             // Remove any existing rain
@@ -1696,18 +1737,14 @@
             document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             
             updateCarSimulation();
+            setWeather(True);
 
             // Distance (OFF)
             distanceToggle.checked = false;
             distanceSlider.disabled = true;
             distanceValue.style.opacity = '0.5';
             distanceSliderWrapper.classList.add('disabled');
-            
-            // Weather (OFF - Sunny)
-            weatherToggle.checked = false;
-            weatherValue.textContent = "Sunny";
-            simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
-            
+                        
             // Road Surface (OFF - Concrete)
             roadSurfaceToggle.checked = false;
             roadSurfaceValue.textContent = "Concrete";
@@ -1739,13 +1776,7 @@
             distanceIndicator.style.display = 'none';
             distanceTraveledIndicator.style.display = 'none';
             
-            // Reset weather elements
-            weatherToggle.checked = false;
-            weatherValue.textContent = "Sunny";
-            simulationView.style.background = "linear-gradient(to bottom, #87CEEB, #E0F7FF)";
-            document.querySelector('.sun').style.opacity = '1';
-            document.querySelector('.clouds').style.opacity = '0';
-            removeRainEffect();
+           setWeather(True);
 
             // Reset mass
             massSlider.value = 0;
@@ -1756,9 +1787,7 @@
             carRear.classList.remove('lights-on');
                     
             // Reset road surface
-            roadSurfaceToggle.checked = false;
-            roadSurfaceValue.textContent = "Concrete";
-            document.querySelector('.road').style.background = "#8B7355";
+            setRoadSurface(True);
             
             // Reset simulation state
             if (animationFrame) cancelAnimationFrame(animationFrame);
