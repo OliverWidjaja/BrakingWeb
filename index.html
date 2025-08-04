@@ -655,6 +655,38 @@
             border-radius: 50%;
             bottom: 45px;
         }
+        .speed-indicator {
+            position: absolute;
+            bottom: calc(100% + 5px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(51, 51, 51, 0.9); /* Dark grey background */
+            color: #fff; /* White text */
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* subtle border */
+        }
+
+        .speed-indicator .speed-value {
+            font-size: 0.9rem;
+            margin-right: 2px;
+            color: #fff; /* Ensure text is white */
+        }
+
+        .car-rear:hover .speed-indicator {
+            display: block; /* Show on hover when not moving */
+        }
+
+        /* Show always when moving */
+        .car-rear.moving .speed-indicator {
+            display: block;
+        }
         .buildings {
             position: absolute;
             width: 100%;
@@ -932,6 +964,9 @@
                             <div class="car car-front">A</div>
                             <div class="car car-rear">B
                                 <div class="car-rear-light"></div>
+                                <div class="speed-indicator">
+                                    <span class="speed-value">0</span> km/h
+                                </div>
                             </div>
                             <div class="distance-indicator" id="distanceIndicator">
                                 <span class="distance-value" id="simDistanceValue">20 m</span>
@@ -1407,7 +1442,7 @@
             
             // Calculate velocities (pixels per second)
             const approachVelocity = 300; // Constant approach speed
-            const brakingVelocity = approachVelocity / 1.5 // Start braking at same speed
+            const brakingVelocity = approachVelocity / 2 // Start braking at same speed
             
             // Calculate durations for each phase (in ms)
             const phase1Duration = (distanceTo100m / approachVelocity) * 1000;
@@ -1421,6 +1456,7 @@
                 // Phase 1: Linear approach (constant speed)
                 const phaseProgress = elapsed / phase1Duration;
                 currentPos = startCarB + phaseProgress * (maxDistancePosition - startCarB);
+                currentSpeed = approachVelocity; // Constant speed during approach
             } else {
                 // Phase 2: Smooth deceleration
                 const phase2Elapsed = elapsed - phase1Duration;
@@ -1429,7 +1465,18 @@
                 // Quadratic ease-out for smooth deceleration
                 const easedProgress = 1 - Math.pow(1 - phase2Progress, 1.2);
                 currentPos = maxDistancePosition + easedProgress * (endCarB - maxDistancePosition);
+                
+                // Calculate current speed (decelerating)
+                currentSpeed = brakingVelocity * (1 - phase2Progress);
             }
+
+            // Update speed display (convert from px/s to km/h for display)
+            // Conversion factor: 3px = 1m, so 1px/s = 0.333 m/s = 1.2 km/h
+            const displaySpeed = Math.round(currentSpeed * 0.2);
+            document.querySelector('.speed-indicator .speed-value').textContent = displaySpeed;
+            
+            // Add moving class to always show speed during animation
+            carRear.classList.add('moving');
 
             const realDistance = updateCarSimulation(currentPos);
 
@@ -1446,6 +1493,7 @@
                 isRunning = false;
                 simStartBtn.disabled = false;
                 simStopBtn.disabled = true;
+                carRear.classList.remove('moving'); // Remove moving class when stopped
                 updateCarSimulation();
             }
         }
@@ -1675,6 +1723,9 @@
             updateInclineSliderFill();
             document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             
+            document.querySelector('.speed-indicator .speed-value').textContent = '0';
+            carRear.classList.remove('moving');
+
             // Reset distance
             distanceSlider.value = 20;
             distanceValue.textContent = "20 m";
