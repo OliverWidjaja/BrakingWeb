@@ -1295,7 +1295,6 @@
         let startTime = null;
         let currentPos = null;
         let stopPos = null;
-        let duration = 2000;
         let maxDistancePosition = null;
 
         // Add this helper function to calculate distance between cars
@@ -1390,34 +1389,63 @@
             return realDistance;
         }
 
-        // Update the animateCarRear function
+        // Update the animateCarRear function for smooth speed transition
         function animateCarRear(timestamp) {
             if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            
             const simulationWidth = simulationView.offsetWidth;
             const carFrontPos = simulationWidth * 0.7;
-            const startCarB = 10;
+            const startCarB = -200;
             const endCarB = stopPos;
-            const progress = Math.min((timestamp - startTime) / duration, 1);
-            const eased = 0.5 - 0.5 * Math.cos(Math.PI * progress);
-            currentPos = startCarB + eased * (endCarB - startCarB);
-            const realDistance = updateCarSimulation(currentPos);
             
-            // Only show indicator if Car B has passed the max distance position
+            // Calculate total distance to travel (in pixels)
+            const totalDistance = endCarB - startCarB;
+            
+            // Calculate the distance to the 100m mark (maxDistancePosition)
+            const distanceTo100m = maxDistancePosition - startCarB;
+            
+            // Calculate velocities (pixels per second)
+            const approachVelocity = 300; // Constant approach speed
+            const brakingVelocity = approachVelocity / 1.5 // Start braking at same speed
+            
+            // Calculate durations for each phase (in ms)
+            const phase1Duration = (distanceTo100m / approachVelocity) * 1000;
+            const phase2Duration = ((endCarB - maxDistancePosition) / brakingVelocity) * 1000;
+            const totalDuration = phase1Duration + phase2Duration;
+            
+            const progress = Math.min(elapsed / totalDuration, 1);
+
+            let currentPos;
+            if (elapsed < phase1Duration) {
+                // Phase 1: Linear approach (constant speed)
+                const phaseProgress = elapsed / phase1Duration;
+                currentPos = startCarB + phaseProgress * (maxDistancePosition - startCarB);
+            } else {
+                // Phase 2: Smooth deceleration
+                const phase2Elapsed = elapsed - phase1Duration;
+                const phase2Progress = phase2Elapsed / phase2Duration;
+                
+                // Quadratic ease-out for smooth deceleration
+                const easedProgress = 1 - Math.pow(1 - phase2Progress, 1.2);
+                currentPos = maxDistancePosition + easedProgress * (endCarB - maxDistancePosition);
+            }
+
+            const realDistance = updateCarSimulation(currentPos);
+
             if (currentPos > maxDistancePosition) {
                 distanceIndicator.style.display = 'flex';
-                // Update with real distance during animation
                 simDistanceValue.textContent = `${realDistance} m`;
             } else {
                 distanceIndicator.style.display = 'none';
             }
-            
+
             if (progress < 1 && isRunning && !isPaused) {
                 animationFrame = requestAnimationFrame(animateCarRear);
             } else {
                 isRunning = false;
                 simStartBtn.disabled = false;
                 simStopBtn.disabled = true;
-                // When animation stops, show the slider value again
                 updateCarSimulation();
             }
         }
