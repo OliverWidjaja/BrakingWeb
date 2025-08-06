@@ -945,15 +945,12 @@
                                     <i class="fas fa-car-side parameter-icon"></i>
                                     Distance Between Cars
                                 </span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="distanceToggle">
-                                    <span class="slider-switch"></span>
-                                </label>
+                                
                             </div>
                             <div class="slider-wrapper" id="distanceSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="distanceSliderFill"></div>
-                                <input type="range" min="1" max="100" value="20" class="slider" id="distanceSlider">
+                                <input type="range" min="2" max="20" value="20" class="slider" id="distanceSlider">
                             </div>
                             <div class="slider-value" id="distanceValue">20 m</div>
                         </div>
@@ -1177,28 +1174,16 @@
 
         updateInclineSliderFill();
 
-        const distanceToggle = document.getElementById('distanceToggle');
         const distanceSlider = document.getElementById('distanceSlider');
         const distanceValue = document.getElementById('distanceValue');
         const distanceSliderFill = document.getElementById('distanceSliderFill');
         const distanceSliderWrapper = document.getElementById('distanceSliderWrapper');
         function updateDistanceSliderFill() {
-            const value = distanceSlider.value;
-            const max = distanceSlider.max;
+            const value = distanceSlider.value - 2;
+            const max = distanceSlider.max - 2;
             const percent = (value / max) * 100;
             distanceSliderFill.style.width = `${percent}%`;
         }
-        distanceToggle.addEventListener('change', function() {
-            if (this.checked) {
-                distanceSlider.disabled = false;
-                distanceValue.style.opacity = '1';
-                distanceSliderWrapper.classList.remove('disabled');
-            } else {
-                distanceSlider.disabled = true;
-                distanceValue.style.opacity = '0.5';
-                distanceSliderWrapper.classList.add('disabled');
-            }
-        });
         // Update the distance slider event listener to smoothly update positions
         distanceSlider.addEventListener('input', function() {
             const distance = this.value;
@@ -1740,8 +1725,6 @@
             setWeather(True);
 
             // Distance (OFF)
-            distanceToggle.checked = false;
-            distanceSlider.disabled = true;
             distanceValue.style.opacity = '0.5';
             distanceSliderWrapper.classList.add('disabled');
                         
