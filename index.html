@@ -910,6 +910,20 @@
                         <div class="slider-group">
                             <div class="parameter-header">
                                 <span class="parameter-title">
+                                    <i class="fas fa-tachometer-alt parameter-icon"></i>
+                                    Speed of Car B
+                                </span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <div class="slider-track"></div>
+                                <div class="slider-fill" id="speedSliderFill"></div>
+                                <input type="range" min="30" max="70" value="50" class="slider" id="speedSlider">
+                            </div>
+                            <div class="slider-value" id="speedValue">50 km/h</div>
+                        </div>
+                        <div class="slider-group">
+                            <div class="parameter-header">
+                                <span class="parameter-title">
                                     <i class="fas fa-car-side parameter-icon"></i>
                                     Distance Between Cars
                                 </span>
@@ -1031,6 +1045,22 @@
         const asphaltOption = document.getElementById('asphaltOption');
         const concreteOption = document.getElementById('concreteOption');
         const roadElement = document.querySelector('.road');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        const speedSliderFill = document.getElementById('speedSliderFill');
+        
+        function updateSpeedSliderFill() {
+            const value = speedSlider.value - 30;
+            const max = speedSlider.max - 30;
+            const percent = (value / max) * 100;
+            speedSliderFill.style.width = `${percent}%`;
+        }
+
+        speedSlider.addEventListener('input', function() {
+            const displaySpeed = this.value;
+            speedValue.textContent = displaySpeed + ' km/h';
+            updateSpeedSliderFill();
+        });
 
         function setRoadSurface(isAsphalt) {
             if (isAsphalt) {
@@ -1397,8 +1427,10 @@
             // Calculate the distance to the 100m mark (maxDistancePosition)
             const distanceTo100m = maxDistancePosition - startCarB;
             
-            // Calculate velocities (pixels per second)
-            const approachVelocity = 300; // Constant approach speed
+            // Get speed from slider (30-70 km/h) and convert to pixels/second (150-350)
+            const sliderSpeed = parseInt(speedSlider.value);
+            const approachVelocity = sliderSpeed * 5; // 30km/h*5=150, 70km/h*5=350
+
             const brakingVelocity = approachVelocity / 2 // Start braking at same speed
             
             // Calculate durations for each phase (in ms)
@@ -1512,6 +1544,7 @@
             roadSurfaceValue.textContent = "Concrete";
             document.querySelector('.road').style.background = "#8B7355";
 
+            updateSpeedSliderFill();
             resetAllSettings();
         });
         
@@ -1530,6 +1563,11 @@
             distanceValue.textContent = "20 m";
             updateDistanceSliderFill();
             updateCarSimulation(); // Reset car positions
+
+            // Reset speed
+            speedSlider.value = 50;
+            speedValue.textContent = "50 km/h";
+            updateSpeedSliderFill();
 
             distanceLabel.textContent = "Gap Between Cars: 20m";
             
