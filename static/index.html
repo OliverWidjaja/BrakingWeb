@@ -1060,6 +1060,7 @@
             const displaySpeed = this.value;
             speedValue.textContent = displaySpeed + ' km/h';
             updateSpeedSliderFill();
+            getPredictedDistance();
         });
 
         function setRoadSurface(isAsphalt) {
@@ -1074,9 +1075,14 @@
             }
         }
 
-        // Event listeners for the road surface toggle
-        asphaltOption.addEventListener('click', () => setRoadSurface(true));
-        concreteOption.addEventListener('click', () => setRoadSurface(false));
+        asphaltOption.addEventListener('click', () => {
+            setRoadSurface(true);
+            getPredictedDistance();
+        });
+        concreteOption.addEventListener('click', () => {
+            setRoadSurface(false);
+            getPredictedDistance();
+        });
 
         // Initialize to asphalt
         setRoadSurface(true);
@@ -1189,10 +1195,10 @@
             }
         }
 
-        // Add this event listener with your others
         massSlider.addEventListener('input', function() {
             updateCarMass();
             updateMassSliderFill();
+            getPredictedDistance();
         });
 
         function updateMassSliderFill() {
@@ -1252,9 +1258,15 @@
             }
         }
 
-        // Event listeners for the new toggle
-        sunnyOption.addEventListener('click', () => setWeather(true));
-        rainyOption.addEventListener('click', () => setWeather(false));
+        // Add these to the existing event listeners
+        sunnyOption.addEventListener('click', () => {
+            setWeather(true);
+            getPredictedDistance();
+        });
+        rainyOption.addEventListener('click', () => {
+            setWeather(false);
+            getPredictedDistance();
+        });
 
         // Initialize to sunny
         setWeather(true);
@@ -1486,6 +1498,46 @@
                 updateCarSimulation();
             }
         }
+
+        async function getPredictedDistance() {
+            try {
+                // Collect current parameters
+                const params = {
+                    weather: sunnyOption.classList.contains('active') ? 'sunny' : 'rainy',
+                    roadSurface: asphaltOption.classList.contains('active') ? 'asphalt' : 'concrete',
+                    speed: parseInt(speedSlider.value),
+                    mass: parseInt(massSlider.value),
+                    incline: parseInt(inclineSlider.value)
+                };
+
+                // Send to backend
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(params)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                // Update distance slider with predicted value
+                if (data.distance) {
+                    distanceSlider.value = data.distance;
+                    distanceValue.textContent = data.distance + ' m';
+                    updateDistanceSliderFill();
+                    updateCarSimulation();
+                }
+
+            } catch (error) {
+                console.error('Error getting prediction:', error);
+            }
+        }
+
         simStartBtn.addEventListener('click', () => {
             if (isRunning) return;
             isRunning = true;
@@ -1601,12 +1653,12 @@
         // Call this on page load
         document.addEventListener('DOMContentLoaded', resetAllSettings);
 
-        // Update on slider input
         inclineSlider.addEventListener('input', function() {
             const angle = this.value;
             inclineValue.textContent = angle + '°';
             updateInclineSliderFill();
             document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
+            getPredictedDistance();
         });
 
         // Optional: Also reset when restart button is clicked
