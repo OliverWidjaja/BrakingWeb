@@ -903,9 +903,9 @@
                             <div class="slider-wrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="massSliderFill"></div>
-                                <input type="range" min="0" max="5" value="0" class="slider" id="massSlider">
+                                <input type="range" min="0" max="5" value="3" class="slider" id="massSlider">
                             </div>
-                            <div class="slider-value" id="massValue">1x</div>
+                            <div class="slider-value" id="massValue">3x</div>
                         </div>
                         <div class="slider-group">
                             <div class="parameter-header">
@@ -1532,17 +1532,15 @@
             // Ensure road starts flat (0°)
             document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             
+            
+            setWeather(true);
             updateCarSimulation();
-            setWeather(True);
 
-            // Distance (OFF)
-            distanceValue.style.opacity = '0.5';
-            distanceSliderWrapper.classList.add('disabled');
-                        
-            // Road Surface (OFF - Concrete)
-            roadSurfaceToggle.checked = false;
-            roadSurfaceValue.textContent = "Concrete";
-            document.querySelector('.road').style.background = "#8B7355";
+            // Reset mass
+            massSlider.value = 3;
+            massValue.textContent = "3x";
+            updateCarMass();
+            updateMassSliderFill();
 
             updateSpeedSliderFill();
             resetAllSettings();
@@ -1581,10 +1579,10 @@
            setWeather(True);
 
             // Reset mass
-            massSlider.value = 0;
-            massValue.textContent = "0x";
-            updateMassSliderFill();
+            massSlider.value = 3;
+            massValue.textContent = "3x";
             updateCarMass();
+            updateMassSliderFill();
 
             carRear.classList.remove('lights-on');
                     
