@@ -612,6 +612,21 @@
             background: rgba(255, 165, 0, 0.9);
             top: -18px;
         }
+        .distance-label {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 102, 153, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+            white-space: nowrap;
+        }
         .road-surface-state {
             display: block;
             text-align: center;
@@ -1005,6 +1020,7 @@
                                 <div class="warning-arc outer"></div>
                             </div>
                         </div>
+                        <div class="distance-label" id="distanceLabel">Gap Between Cars: 20m</div>
                         <div class="scenery">
                             <div class="trees">
                                 <div class="tree"><div class="tree-trunk"></div><div class="tree-top"></div></div>
@@ -1371,7 +1387,8 @@
 
         const distanceTraveledValue = document.getElementById('distanceTraveledValue');
         const distanceTraveledIndicator = document.getElementById('distanceTraveledIndicator');
-
+        const distanceLabel = document.getElementById('distanceLabel');
+        
         // Modify the updateCarSimulation function to include warning arc logic
         function updateCarSimulation(positionB = null) {
             const distance = parseInt(distanceSlider.value);
@@ -1397,7 +1414,8 @@
             carRear.style.left = `${carRearPos}px`;
             
             const realDistance = calculateRealDistance(carFrontPos, carRearPos, carWidth);
-            
+            distanceLabel.textContent = `Gap Between Cars: ${distanceSlider.value}m`;
+
             // Show/hide warning arcs based on distance
             if (realDistance <= 100 && !showWarningArcs) {
                 warningArcs.style.display = 'block';
@@ -1472,7 +1490,7 @@
             
             // Calculate durations for each phase (in ms)
             const phase1Duration = (distanceTo100m / approachVelocity) * 1000;
-            const phase2Duration = ((endCarB - maxDistancePosition) / brakingVelocity) * 1000;
+            const phase2Duration = ((endCarB - maxDistancePosition) / brakingVelocity) * 2000;
             const totalDuration = phase1Duration + phase2Duration;
             
             const progress = Math.min(elapsed / totalDuration, 1);
@@ -1489,7 +1507,7 @@
                 const phase2Progress = phase2Elapsed / phase2Duration;
                 
                 // Quadratic ease-out for smooth deceleration
-                const easedProgress = 1 - Math.pow(1 - phase2Progress, 1.2);
+                const easedProgress = 1 - Math.pow(1 - phase2Progress, 2);
                 currentPos = maxDistancePosition + easedProgress * (endCarB - maxDistancePosition);
                 
                 // Calculate current speed (decelerating)
@@ -1751,6 +1769,8 @@
             distanceValue.textContent = "20 m";
             updateDistanceSliderFill();
             updateCarSimulation(); // Reset car positions
+
+            distanceLabel.textContent = "Gap Between Cars: 20m";
             
             // Hide warning arcs
             warningArcs.style.display = 'none';
