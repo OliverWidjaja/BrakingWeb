@@ -187,53 +187,6 @@
             color: #006699;
             margin-top: 5px;
         }
-        .graph-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-        .graph-item {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid rgba(0, 102, 153, 0.2);
-        }
-        .graph-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .graph-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #003366;
-        }
-        .graph-controls {
-            display: flex;
-            gap: 6px;
-        }
-        .graph-btn {
-            background: rgba(0, 102, 153, 0.1);
-            color: #006699;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.8rem;
-            border: 1px solid rgba(0, 102, 153, 0.2);
-        }
-        .graph-btn:hover {
-            background: rgba(0, 102, 153, 0.2);
-        }
-        .chart-container {
-            width: 100%;
-            height: 180px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 8px;
-            padding: 10px;
-        }
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -1066,46 +1019,6 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="card metrics-card">
-                <div class="card-header">
-                    <div class="card-header-content">
-                        <div class="card-icon">
-                            <i class="fas fa-tachometer-alt"></i>
-                        </div>
-                        <h2 class="card-title">Performance Metrics</h2>
-                    </div>
-                </div>
-    
-                <div class="graph-container">
-                    <div class="graph-item" style="flex: 1;">
-                        <div class="graph-header">
-                            <h3 class="graph-title">Speed vs Distance</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="speedChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="graph-item" style="flex: 1;">
-                        <div class="graph-header">
-                            <h3 class="graph-title">Acceleration vs Distance</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="accelerationChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="graph-item" style="flex: 1;">
-                        <div class="graph-header">
-                            <h3 class="graph-title">Jerk vs Distance</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="inertiaChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         
         <div class="footer">
@@ -1582,158 +1495,6 @@
         });
         updateCarSimulation(20);
 
-        // Chart.js Metrics
-        const speedCtx = document.getElementById('speedChart').getContext('2d');
-        const accelerationCtx = document.getElementById('accelerationChart').getContext('2d');
-        const inertiaCtx = document.getElementById('inertiaChart').getContext('2d');
-        const distanceLabels = ['0m', '20m', '40m', '60m', '80m', '100m'];
-        const speedChart = new Chart(speedCtx, {
-            type: 'line',
-            data: {
-                labels: distanceLabels,
-                datasets: [{
-                    label: 'Speed',
-                    data: [0, 25, 45, 60, 45, 30],
-                    borderColor: '#006699',
-                    backgroundColor: 'rgba(0, 102, 153, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    }
-                }
-            }
-        });
-        const accelerationChart = new Chart(accelerationCtx, {
-            type: 'line',
-            data: {
-                labels: distanceLabels,
-                datasets: [{
-                    label: 'Acceleration',
-                    data: [0, 15, 30, 40, 25, 10],
-                    borderColor: '#00cc99',
-                    backgroundColor: 'rgba(0, 204, 153, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    }
-                }
-            }
-        });
-        const inertiaChart = new Chart(inertiaCtx, {
-            type: 'line',
-            data: {
-                labels: distanceLabels,
-                datasets: [{
-                    label: 'Jerk',
-                    data: [10, 45, 70, 85, 60, 30],
-                    borderColor: '#0099cc',
-                    backgroundColor: 'rgba(0, 153, 204, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#003366',
-                            font: { size: 10 }
-                        }
-                    }
-                }
-            }
-        });
-
-        //money
-
         // Set all toggles to OFF when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Ensure road starts flat (0°)
@@ -1798,14 +1559,7 @@
             isPaused = false;
             simStartBtn.disabled = false;
             simStopBtn.disabled = true;
-            
-            // Reset charts if needed
-            speedChart.data.datasets[0].data = [0, 25, 45, 60, 45, 30];
-            accelerationChart.data.datasets[0].data = [0, 15, 30, 40, 25, 10];
-            inertiaChart.data.datasets[0].data = [10, 45, 70, 85, 60, 30];
-            speedChart.update();
-            accelerationChart.update();
-            inertiaChart.update();
+
         }
 
         // Call this on page load
