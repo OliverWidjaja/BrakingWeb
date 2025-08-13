@@ -19,7 +19,7 @@ def predict():
             'weather': [1 if data['weather'] == 'rainy' else 0],
             'road_type': [1 if data['roadSurface'] == 'asphalt' else 0.7],
             'speed_kmh': [data['speed']],
-            'car_mass': [data['mass'] * 500],  # Assuming 500kg per unit
+            'car_mass': [data['mass']],  # Assuming 500kg per unit
             'avg_slope_deg': [data['incline']],
             'max_slope_deg': [data['incline']]
         })
