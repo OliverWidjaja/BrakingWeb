@@ -368,11 +368,11 @@
         }
         .road {
             position: absolute;
-            width: 100%;
+            width: 105%;
             height: 120px;
             background: #4d4d4d;
             top: 50%;
-            left: 0;
+            left: -1%;
             transform: translateY(-50%) rotate(0deg);
             transform-origin: center center;
             display: flex;
@@ -903,7 +903,7 @@
                             <div class="slider-wrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="massSliderFill"></div>
-                                <input type="range" min="0" max="5" value="3" class="slider" id="massSlider">
+                                <input type="range" min="1300" max="2000" steps="140" value="1720" class="slider" id="massSlider">
                             </div>
                             <div class="slider-value" id="massValue">3x</div>
                         </div>
@@ -1160,7 +1160,7 @@
         // Add this function to update the mass visualization
         function updateCarMass() {
             const mass = parseInt(massSlider.value);
-            massValue.textContent = mass + 'x';
+            massValue.textContent = mass + ' kg';
             
             // Remove existing weights if any
             const existingWeights = carRear.querySelector('.car-weights');
@@ -1168,13 +1168,20 @@
                 existingWeights.remove();
             }
             
-            // Add weights if mass > 0
-            if (mass > 0) {
+            // Calculate weight blocks based on specific mass thresholds
+            let weightCount = 0;
+            if (mass >= 1440 && mass < 1580) weightCount = 1;
+            else if (mass >= 1580 && mass < 1720) weightCount = 2;
+            else if (mass >= 1720 && mass < 1860) weightCount = 3;
+            else if (mass >= 1860 && mass < 2000) weightCount = 4;
+            else if (mass >= 2000) weightCount = 5;
+            
+            // Add weight blocks
+            if (weightCount > 0) {
                 const weightsContainer = document.createElement('div');
                 weightsContainer.className = 'car-weights';
                 
-                // Add weight blocks based on mass value
-                for (let i = 0; i < mass; i++) {
+                for (let i = 0; i < weightCount; i++) {
                     const weight = document.createElement('div');
                     weight.className = 'car-weight';
                     weightsContainer.appendChild(weight);
@@ -1191,11 +1198,12 @@
         });
 
         function updateMassSliderFill() {
-            const value = massSlider.value;
-            const max = massSlider.max;
+            const value = massSlider.value - 1300;
+            const max = massSlider.max - 1300;
             const percent = (value / max) * 100;
             massSliderFill.style.width = `${percent}%`;
         }
+
         // Vehicle Simulation Animation Logic
         const simStartBtn = document.getElementById('simStartBtn');
         const simStopBtn = document.getElementById('simStopBtn');
@@ -1434,7 +1442,7 @@
                 currentVelocity = maxVelocity;
             } else {
                 // Within braking distance - decelerate
-                const decelerationFactor = distanceToBrakePoint / brakingDistance;
+                const decelerationFactor = Math.pow(distanceToBrakePoint / brakingDistance, 0.7);
                 currentVelocity = maxVelocity * decelerationFactor;
             }
             
@@ -1559,8 +1567,8 @@
             updateCarSimulation();
 
             // Reset mass
-            massSlider.value = 3;
-            massValue.textContent = "3x";
+            massSlider.value = 1720;
+            massValue.textContent = "1720 kg";
             updateCarMass();
             updateMassSliderFill();
 
@@ -1601,8 +1609,8 @@
             setWeather(true);
 
             // Reset mass
-            massSlider.value = 3;
-            massValue.textContent = "3x";
+            massSlider.value = 1720;
+            massValue.textContent = "1720 kg";
             updateCarMass();
             updateMassSliderFill();
 
