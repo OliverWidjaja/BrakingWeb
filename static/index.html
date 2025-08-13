@@ -925,16 +925,15 @@
                             <div class="parameter-header">
                                 <span class="parameter-title">
                                     <i class="fas fa-car-side parameter-icon"></i>
-                                    Distance Between Cars
+                                    Braking Distance
                                 </span>
-                                
                             </div>
                             <div class="slider-wrapper" id="distanceSliderWrapper">
                                 <div class="slider-track"></div>
                                 <div class="slider-fill" id="distanceSliderFill"></div>
-                                <input type="range" min="2" max="20" value="20" class="slider" id="distanceSlider">
+                                <input type="range" min="0" max="98" value="98" class="slider" id="distanceSlider">
                             </div>
-                            <div class="slider-value" id="distanceValue">20 m</div>
+                            <div class="slider-value" id="distanceValue">98 m</div>
                         </div>
                     </div>
                 </div>
@@ -987,7 +986,8 @@
                                 <div class="warning-arc outer"></div>
                             </div>
                         </div>
-                        <div class="distance-label" id="distanceLabel">Gap Between Cars: 20m</div>
+                        <!-- Change this line in your HTML -->
+                        <div class="distance-label" id="distanceLabel">Braking Distance: 98m (Gap: 2m)</div>
                         <div class="scenery">
                             <div class="trees">
                                 <div class="tree"><div class="tree-trunk"></div><div class="tree-top"></div></div>
@@ -1090,7 +1090,6 @@
         // incline  sliders
         const inclineSlider = document.getElementById('inclineSlider');
         const inclineSliderFill = document.getElementById('inclineSliderFill');
-        const inclineSliderWrapper = document.getElementById('inclineSliderWrapper');
 
         // Update the slider fill calculation to handle negative range
         function updateInclineSliderFill() {
@@ -1123,29 +1122,19 @@
             
             // Update road angle
             document.querySelector('.road').style.transform = `translateY(-50%) rotate(${-angle}deg)`;
-            
-            // Update pileup positioning if you have that feature
-            if (angle > 0) {
-                pileupLeft.style.bottom = '0';
-                pileupRight.style.bottom = `${angle * 0.5}px`;
-            } else if (angle < 0) {
-                pileupLeft.style.bottom = `${Math.abs(angle) * 0.5}px`;
-                pileupRight.style.bottom = '0';
-            } else {
-                pileupLeft.style.bottom = '0';
-                pileupRight.style.bottom = '0';
-            }
         });
 
         updateInclineSliderFill();
 
         const distanceSlider = document.getElementById('distanceSlider');
         const distanceValue = document.getElementById('distanceValue');
+        distanceValue.textContent = "98 m"; // Initial value
+        
         const distanceSliderFill = document.getElementById('distanceSliderFill');
-        const distanceSliderWrapper = document.getElementById('distanceSliderWrapper');
+        
         function updateDistanceSliderFill() {
-            const value = distanceSlider.value - 2;
-            const max = distanceSlider.max - 2;
+            const value = distanceSlider.value;
+            const max = distanceSlider.max;
             const percent = (value / max) * 100;
             distanceSliderFill.style.width = `${percent}%`;
         }
@@ -1327,7 +1316,6 @@
         let startTime = null;
         let currentPos = null;
         let stopPos = null;
-        let maxDistancePosition = null;
 
         // Add this helper function to calculate distance between cars
         function calculateRealDistance(carAPos, carBPos, carWidth) {
@@ -1344,158 +1332,133 @@
         const distanceTraveledIndicator = document.getElementById('distanceTraveledIndicator');
         const distanceLabel = document.getElementById('distanceLabel');
         
-        // Modify the updateCarSimulation function to include warning arc logic
+        // Modify the updateCarSimulation function
         function updateCarSimulation(positionB = null) {
-            const distance = parseInt(distanceSlider.value);
+            const brakingDistance = parseInt(distanceSlider.value);
             const simulationWidth = simulationView.offsetWidth;
             const carWidth = 80;
             const carFrontPos = simulationWidth * 0.7;
-            
-            const pixelDistance = distance * 3;
+            const constantGap = 6; // 2m * 3px/m
             
             let carRearPos;
             if (positionB !== null) {
                 carRearPos = positionB;
             } else {
-                carRearPos = carFrontPos - pixelDistance - carWidth;
+                // Initial position is braking distance + 2m gap from car A
+                carRearPos = carFrontPos - (brakingDistance * 3) - carWidth - constantGap;
                 if (carRearPos < 20) carRearPos = 20;
             }
-            
-            const maxPixelDistance = 101 * 3;
-            maxDistancePosition = carFrontPos - maxPixelDistance - carWidth;
-            if (maxDistancePosition < 20) maxDistancePosition = 20;
             
             carFront.style.left = `${carFrontPos}px`;
             carRear.style.left = `${carRearPos}px`;
             
-            const realDistance = calculateRealDistance(carFrontPos, carRearPos, carWidth);
-            distanceLabel.textContent = `Gap Between Cars: ${distanceSlider.value}m`;
-
-            // Show/hide warning arcs based on distance
-            if (realDistance <= 100 && !showWarningArcs) {
-                warningArcs.style.display = 'block';
-                showWarningArcs = true;
-            } else if (realDistance > 100 && showWarningArcs) {
-                warningArcs.style.display = 'none';
-                showWarningArcs = false;
-            }
+            // Calculate real-time distance between cars in meters
+            const realDistance = Math.max(0, Math.round((carFrontPos - (carRearPos + carWidth)) / 3));
             
-            // Position the warning arcs relative to Car B
-            if (showWarningArcs) {
-                warningArcs.style.left = `${carRearPos}px`;
-            }
-            
-            // Update original distance indicator (blue)
-            const indicatorLeft = carRearPos + carWidth;
-            const indicatorWidth = carFrontPos - indicatorLeft;
-            
-            if (indicatorWidth > 0 && carRearPos > maxDistancePosition) {
-                distanceIndicator.style.left = `${indicatorLeft}px`;
-                distanceIndicator.style.width = `${indicatorWidth}px`;
+            // Show blue indicator only when distance is less than 30m and cars are visible
+            if (carRearPos >= 0 && realDistance < 30) {
+                distanceIndicator.style.left = `${carRearPos + carWidth}px`;
+                distanceIndicator.style.width = `${carFrontPos - (carRearPos + carWidth)}px`;
                 distanceIndicator.style.display = 'flex';
-                simDistanceValue.textContent = isRunning ? `${realDistance} m` : `${distance} m`;
+                simDistanceValue.textContent = `${realDistance} m`;
+            } else {
+                distanceIndicator.style.display = 'none';
+            }
+            
+            // Calculate braking distance parameters
+            const brakingStartPos = carFrontPos - (brakingDistance * 3) - carWidth - constantGap;
+            
+            // Show orange indicator when car is within braking distance or simulation is stopped at final position
+            const isWithinBrakingDistance = positionB !== null && positionB >= brakingStartPos;
+            const isFinalPosition = !isRunning && carRearPos >= 0 && carRearPos <= (carFrontPos - carWidth - constantGap);
+            
+            if (isWithinBrakingDistance || isFinalPosition) {
+                // Calculate how much of the braking distance has been traveled
+                const traveledPixels = isFinalPosition ? 
+                    brakingDistance * 3 : 
+                    carRearPos - brakingStartPos;
                 
-                // Update traveled distance indicator (green)
-                const traveledDistance = 100 - realDistance;
-                const traveledIndicatorLeft = maxDistancePosition + carWidth;
-                const traveledIndicatorWidth = carRearPos - maxDistancePosition;
+                const traveledDistance = Math.round(traveledPixels / 3);
                 
-                distanceTraveledIndicator.style.left = `${traveledIndicatorLeft}px`;
-                distanceTraveledIndicator.style.width = `${traveledIndicatorWidth}px`;
+                // Position the orange indicator at the braking start point
+                distanceTraveledIndicator.style.left = `${brakingStartPos}px`;
+                // Set width to the traveled distance
+                distanceTraveledIndicator.style.width = `${traveledPixels}px`;
                 distanceTraveledIndicator.style.display = 'flex';
                 distanceTraveledValue.textContent = `${traveledDistance} m`;
             } else {
-                distanceIndicator.style.display = 'none';
                 distanceTraveledIndicator.style.display = 'none';
             }
             
-            stopPos = carFrontPos - pixelDistance - carWidth;
-            if (stopPos < 20) stopPos = 20;
-
-            // Check if we've passed the 100m mark (maxDistancePosition)
-            if (positionB !== null && positionB > maxDistancePosition) {
+            distanceLabel.textContent = `Braking Distance: ${brakingDistance}m (Gap: ${realDistance}m)`;
+            
+            // Check if we're within braking distance (and visible)
+            if (positionB !== null && positionB >= 0 && positionB > brakingStartPos) {
                 carRear.classList.add('lights-on');
+                warningArcs.style.display = 'block';
+                warningArcs.style.left = `${positionB}px`;
             } else {
                 carRear.classList.remove('lights-on');
+                warningArcs.style.display = 'none';
             }
             
-            
-            return realDistance;
+            return { brakingDistance, realDistance };
         }
 
-        // Update the animateCarRear function for smooth speed transition
         function animateCarRear(timestamp) {
             if (!startTime) startTime = timestamp;
             const elapsed = timestamp - startTime;
             
             const simulationWidth = simulationView.offsetWidth;
             const carFrontPos = simulationWidth * 0.7;
-            const startCarB = -200;
-            const endCarB = stopPos;
+            const carWidth = 80;
+            const brakingDistance = parseInt(distanceSlider.value) * 3; // Convert meters to pixels (3px/m)
+            const constantGap = 6; // 2m * 3px/m
             
-            // Calculate total distance to travel (in pixels)
-            const totalDistance = endCarB - startCarB;
-            
-            // Calculate the distance to the 100m mark (maxDistancePosition)
-            const distanceTo100m = maxDistancePosition - startCarB;
+            // Start position is outside the frame (left side)
+            const startCarB = -carWidth - 50; // Start 50px outside the frame
+            const endCarB = carFrontPos - carWidth - constantGap; // Final position with 2m gap
             
             // Get speed from slider (30-70 km/h) and convert to pixels/second (150-350)
             const sliderSpeed = parseInt(speedSlider.value);
-            const approachVelocity = sliderSpeed * 5; // 30km/h*5=150, 70km/h*5=350
-
-            const brakingVelocity = approachVelocity / 2 // Start braking at same speed
+            const maxVelocity = sliderSpeed * 5; // 30km/h*5=150, 70km/h*5=350
             
-            // Calculate durations for each phase (in ms)
-            const phase1Duration = (distanceTo100m / approachVelocity) * 1000;
-            const phase2Duration = ((endCarB - maxDistancePosition) / brakingVelocity) * 2000;
-            const totalDuration = phase1Duration + phase2Duration;
+            // Calculate current position
+            const currentCarBPos = startCarB + (maxVelocity * (elapsed / 1000));
+            const distanceToBrakePoint = (carFrontPos - carWidth - constantGap) - currentCarBPos;
             
-            const progress = Math.min(elapsed / totalDuration, 1);
-
-            let currentPos;
-            if (elapsed < phase1Duration) {
-                // Phase 1: Linear approach (constant speed)
-                const phaseProgress = elapsed / phase1Duration;
-                currentPos = startCarB + phaseProgress * (maxDistancePosition - startCarB);
-                currentSpeed = approachVelocity; // Constant speed during approach
+            // Determine current velocity - full speed until braking distance, then decelerate
+            let currentVelocity;
+            if (distanceToBrakePoint > brakingDistance) {
+                // Before braking distance - full speed
+                currentVelocity = maxVelocity;
             } else {
-                // Phase 2: Smooth deceleration
-                const phase2Elapsed = elapsed - phase1Duration;
-                const phase2Progress = phase2Elapsed / phase2Duration;
-                
-                // Quadratic ease-out for smooth deceleration
-                const easedProgress = 1 - Math.pow(1 - phase2Progress, 2);
-                currentPos = maxDistancePosition + easedProgress * (endCarB - maxDistancePosition);
-                
-                // Calculate current speed (decelerating)
-                currentSpeed = brakingVelocity * (1 - phase2Progress);
+                // Within braking distance - decelerate
+                const decelerationFactor = distanceToBrakePoint / brakingDistance;
+                currentVelocity = maxVelocity * decelerationFactor;
             }
-
-            // Update speed display (convert from px/s to km/h for display)
-            // Conversion factor: 3px = 1m, so 1px/s = 0.333 m/s = 1.2 km/h
-            const displaySpeed = Math.round(currentSpeed * 0.2);
+            
+            // Update speed display
+            const displaySpeed = Math.round(currentVelocity / 5); // Convert back to km/h
             document.querySelector('.speed-indicator .speed-value').textContent = displaySpeed;
             
             // Add moving class to always show speed during animation
             carRear.classList.add('moving');
 
-            const realDistance = updateCarSimulation(currentPos);
+            // Update car positions and get current distance
+            const { realDistance } = updateCarSimulation(Math.min(currentCarBPos, endCarB));
 
-            if (currentPos > maxDistancePosition) {
-                distanceIndicator.style.display = 'flex';
-                simDistanceValue.textContent = `${realDistance} m`;
-            } else {
-                distanceIndicator.style.display = 'none';
-            }
-
-            if (progress < 1 && isRunning && !isPaused) {
+            if (currentCarBPos < endCarB && isRunning && !isPaused) {
                 animationFrame = requestAnimationFrame(animateCarRear);
             } else {
                 isRunning = false;
                 simStartBtn.disabled = false;
                 simStopBtn.disabled = true;
-                carRear.classList.remove('moving'); // Remove moving class when stopped
-                updateCarSimulation();
+                carRear.classList.remove('moving');
+                // Update final positions and indicators
+                updateCarSimulation(endCarB);
+                // Show final speed (0 km/h)
+                document.querySelector('.speed-indicator .speed-value').textContent = '0';
             }
         }
 
@@ -1562,11 +1525,17 @@
             simStartBtn.disabled = false;
             simStopBtn.disabled = true;
             if (animationFrame) cancelAnimationFrame(animationFrame);
-            updateCarSimulation(20);
+            // Reset to starting position (outside frame)
+            updateCarSimulation(-80 - 50); // Car width + 50px outside
+            document.querySelector('.speed-indicator .speed-value').textContent = '0';
+            carRear.classList.remove('moving');
+            carRear.classList.remove('lights-on');
+            warningArcs.style.display = 'none';
         });
+        // Update the distance slider event listener
         distanceSlider.addEventListener('input', function() {
-            const distance = this.value;
-            distanceValue.textContent = distance + ' m';
+            const distanceTraveled = this.value;
+            distanceValue.textContent = distanceTraveled + ' m';
             updateDistanceSliderFill();
             
             // Only update position if simulation isn't running
@@ -1574,10 +1543,11 @@
                 updateCarSimulation();
             }
         });
+
         window.addEventListener('resize', () => {
             if (!isRunning) updateCarSimulation();
         });
-        updateCarSimulation(20);
+        updateCarSimulation(0);
 
         // Set all toggles to OFF when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -1608,19 +1578,19 @@
             document.querySelector('.speed-indicator .speed-value').textContent = '0';
             carRear.classList.remove('moving');
 
-            // Reset distance
-            distanceSlider.value = 20;
-            distanceValue.textContent = "20 m";
+            // Reset braking distance
+            distanceSlider.value = 98;
+            distanceValue.textContent = "98 m";
             updateDistanceSliderFill();
             updateCarSimulation(); // Reset car positions
+            
+            distanceLabel.textContent = "Braking Distance: 98m (Gap: 2m)";
 
             // Reset speed
             speedSlider.value = 50;
             speedValue.textContent = "50 km/h";
             updateSpeedSliderFill();
 
-            distanceLabel.textContent = "Gap Between Cars: 20m";
-            
             // Hide warning arcs
             warningArcs.style.display = 'none';
             showWarningArcs = false;
@@ -1628,7 +1598,7 @@
             distanceIndicator.style.display = 'none';
             distanceTraveledIndicator.style.display = 'none';
             
-           setWeather(True);
+            setWeather(true);
 
             // Reset mass
             massSlider.value = 3;
@@ -1639,7 +1609,7 @@
             carRear.classList.remove('lights-on');
                     
             // Reset road surface
-            setRoadSurface(True);
+            setRoadSurface(true);
             
             // Reset simulation state
             if (animationFrame) cancelAnimationFrame(animationFrame);
@@ -1647,7 +1617,6 @@
             isPaused = false;
             simStartBtn.disabled = false;
             simStopBtn.disabled = true;
-
         }
 
         // Call this on page load
