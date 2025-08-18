@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Braking Model</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -724,17 +724,53 @@
             color: #006699;
             font-weight: bold;
         }
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .control-cards {
-                flex-direction: column;
-            }
-            .combined-card, .simulation-container {
+        /* Replace the existing @media (max-width: 992px) section with this: */
+        @media (max-width: 1200px) {
+            .dashboard {
+                width: 95%;
                 max-width: 100%;
-                flex: 1 1 100%;
+                margin: 10px auto;
             }
-            .graph-container {
-                flex-direction: column;
+            
+            .control-cards {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .combined-card {
+                flex: 1 1 40%;
+                max-width: 48%;
+                min-width: 300px;
+            }
+            
+            .simulation-container {
+                flex: 1 1 55%;
+                max-width: 100%;
+                min-width: 300px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            /* Adjust font sizes for smaller screens */
+            .card-title, .simulation-title {
+                font-size: 1.1rem;
+            }
+            
+            .parameter-title {
+                font-size: 0.9rem;
+            }
+            
+            .slider-value {
+                font-size: 1.2rem;
+            }
+            
+            /* Make buttons smaller */
+            .sim-btn {
+                padding: 6px 12px;
+                font-size: 0.9rem;
             }
         }
         /* Replace the existing .car-weights and .car-weight styles with these: */
@@ -825,8 +861,20 @@
             left: 80%;
         }
 
-        /* Add this at the end of your existing CSS */
         @media (max-width: 768px) {
+            .control-cards {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                gap: 8px;
+            }
+            
+            .combined-card, .simulation-container {
+                flex: 0 0 90%;
+                min-width: 90%;
+                margin-right: 10px;
+            }
+            
             /* Hide sun, clouds, rain, and traffic light on mobile */
             .sun, .clouds, .rain-container, .traffic-light-container {
                 display: none !important;
@@ -840,6 +888,45 @@
             /* Adjust the simulation view height to compensate for removed elements */
             .simulation-view {
                 min-height: 250px;
+            }
+            
+            /* Make the dashboard slightly narrower on very small screens */
+            .dashboard {
+                width: 98%;
+            }
+        }
+
+        /* Add this for very small screens to prevent horizontal scrolling */
+        @media (max-width: 480px) {
+            html, body {
+                overflow-x: hidden;
+            }
+            
+            body {
+                padding: 5px;
+            }
+            
+            .dashboard {
+                width: 100%;
+                border-radius: 8px;
+            }
+            
+            .control-cards {
+                gap: 5px;
+            }
+            
+            .combined-card, .simulation-container {
+                flex: 0 0 95%;
+                min-width: 95%;
+            }
+            
+            .card {
+                padding: 10px;
+            }
+            
+            .sim-btn {
+                padding: 5px 10px;
+                font-size: 0.8rem;
             }
         }
         /* Footer */
