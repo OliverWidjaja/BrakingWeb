@@ -895,9 +895,19 @@
             .road {
                 height: 60px;
             }
+
+            /* Hide sun, clouds, rain, and traffic light on mobile */
+            .sun, .clouds, .rain-container, .traffic-light-container {
+                display: none !important;
+            }
+            
+            /* Hide all trees on mobile */
+            .trees, .tree, .tree-trunk, .tree-top {
+                display: none !important;
+            }
             
             /* Hide decorative elements */
-            .trees, .rain-container .weather-elements{
+            .trees, .weather-elements{
                 display: none;
             }
             
@@ -948,6 +958,23 @@
             .footer {
                 padding: 8px;
                 font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Hide sun, clouds, rain, and traffic light on mobile */
+            .sun, .clouds, .rain-container, .traffic-light-container {
+                display: none !important;
+            }
+            
+            /* Hide all trees on mobile */
+            .trees, .tree, .tree-trunk, .tree-top {
+                display: none !important;
+            }
+            
+            /* Adjust the simulation view height to compensate for removed elements */
+            .simulation-view {
+                min-height: 250px;
             }
         }
 
