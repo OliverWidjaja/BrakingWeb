@@ -861,6 +861,116 @@
             left: 80%;
         }
 
+        /* Add this media query for landscape mobile devices */
+        @media (max-width: 992px) and (orientation: landscape) {
+            .dashboard {
+                width: 95%;
+                max-width: 100%;
+                margin: 10px auto;
+            }
+            
+            .control-cards {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 10px;
+            }
+            
+            .combined-card {
+                flex: 0 0 40%;
+                max-width: 40%;
+                min-width: 0;
+                overflow: hidden;
+            }
+            
+            .simulation-container {
+                flex: 0 0 60%;
+                max-width: 60%;
+                min-width: 0;
+            }
+            
+            /* Make sliders more compact */
+            .slider-group {
+                padding: 8px;
+            }
+            
+            .slider-value {
+                font-size: 1.2rem;
+            }
+            
+            /* Adjust car size */
+            .car {
+                width: 60px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            /* Adjust traffic light size */
+            .traffic-light {
+                width: 20px;
+                height: 60px;
+            }
+            
+            .traffic-light-pole {
+                width: 8px;
+                height: 80px;
+            }
+            
+            .light {
+                width: 15px;
+                height: 15px;
+            }
+            
+            /* Adjust distance indicators */
+            .distance-indicator {
+                height: 2px;
+            }
+            
+            .distance-value {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+            
+            /* Make buttons smaller */
+            .sim-btn {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+            
+            /* Adjust card titles */
+            .card-title, .simulation-title {
+                font-size: 1rem;
+            }
+            
+            /* Adjust parameter titles */
+            .parameter-title {
+                font-size: 0.8rem;
+            }
+            
+            /* Hide some decorative elements */
+            .trees, .buildings {
+                display: none;
+            }
+            
+            /* Adjust road height */
+            .road {
+                height: 80px;
+            }
+            
+            /* Adjust weather toggles */
+            .weather-toggle-container {
+                gap: 5px;
+            }
+            
+            .weather-option {
+                padding: 3px 8px;
+                font-size: 0.8rem;
+            }
+            
+            .weather-divider {
+                display: none;
+            }
+        }
+
         @media (max-width: 768px) {
             .control-cards {
                 flex-direction: row;
