@@ -1,36 +1,33 @@
+
 from flask import Flask, request, jsonify
-import xgboost as xgb
-import pandas as pd
 import os
+from call_braking_model import predict_braking_distance
 
 app = Flask(__name__)
 
-# Load the model once when the app starts
-model = xgb.Booster()
-model.load_model("best_braking_xgboost.json")
+
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Get data from request
         data = request.json
-        
-        # Prepare the data for prediction
-        sample = pd.DataFrame({
-            'weather': [1 if data['weather'] == 'rainy' else 0],
-            'road_type': [1 if data['roadSurface'] == 'asphalt' else 0.7],
-            'speed_kmh': [data['speed']],
-            'car_mass': [data['mass']],  # Assuming 500kg per unit
-            'avg_slope_deg': [data['incline']],
-            'max_slope_deg': [data['incline']]
-        })
-        
-        # Convert to DMatrix and predict
-        dmatrix = xgb.DMatrix(sample)
-        prediction = int(model.predict(dmatrix)[0])
-        
-        return jsonify({'distance': prediction})
-    
+        # Map incoming data to model's expected input
+        # weather: 'ClearNoon' or 'WetCloudySunset'
+        # road_type: 'asphalt' or 'gravel'
+        weather = data.get('weather', 'ClearNoon')
+        road_type = data.get('roadSurface', 'asphalt')
+        speed_kmh = data.get('speed', 60)
+        car_mass = data.get('mass', 1903)
+        slope_deg = data.get('incline', 0.03)
+        prediction = predict_braking_distance(
+            weather=weather,
+            road_type=road_type,
+            speed_kmh=speed_kmh,
+            car_mass=car_mass,
+            slope_deg=slope_deg
+        )
+        return jsonify({'distance': float(prediction)})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

@@ -1357,8 +1357,8 @@
             if (positionB !== null) {
                 carRearPos = positionB;
             } else {
-                // Initial position is braking distance + 2m gap from car A
-                carRearPos = carFrontPos - (brakingDistance * PIXELS_PER_METER) - carWidth - constantGap;
+                // Modified this line to always position with 2m gap
+                carRearPos = carFrontPos - carWidth - constantGap;
                 if (carRearPos < 20) carRearPos = 20;
             }
             
@@ -1419,59 +1419,55 @@
         }
 
         function animateCarRear(timestamp) {
+            if (!isRunning) return; // Only animate if running
+            
             if (!startTime) startTime = timestamp;
             const elapsed = timestamp - startTime;
             
             const simulationWidth = simulationView.offsetWidth;
             const carFrontPos = simulationWidth * 0.7;
             const carWidth = 80;
-            const brakingDistance = parseInt(distanceSlider.value) * PIXELS_PER_METER; // Convert meters to pixels (x px/m)
-            const constantGap = 2 * PIXELS_PER_METER; // 2m * x px/m
+            const brakingDistance = parseInt(distanceSlider.value) * PIXELS_PER_METER;
+            const constantGap = 2 * PIXELS_PER_METER;
             
-            // Start position is outside the frame (left side)
-            const startCarB = -carWidth - 50; // Start 50px outside the frame
-            const endCarB = carFrontPos - carWidth - constantGap; // Final position with 2m gap
+            const startCarB = -carWidth - 50;
+            const endCarB = carFrontPos - carWidth - constantGap;
             
-            // Get speed from slider (30-70 km/h) and convert to pixels/second (150-350)
             const sliderSpeed = parseInt(speedSlider.value);
-            const maxVelocity = sliderSpeed * 5; // 30km/h*5=150, 70km/h*5=350
+            const maxVelocity = sliderSpeed * 5;
             
-            // Calculate current position
             const currentCarBPos = startCarB + (maxVelocity * (elapsed / 1200));
             const distanceToBrakePoint = (carFrontPos - carWidth - constantGap) - currentCarBPos;
             
-            // Determine current velocity - full speed until braking distance, then decelerate
             let currentVelocity;
             if (distanceToBrakePoint > brakingDistance) {
-                // Before braking distance - full speed
                 currentVelocity = maxVelocity;
             } else {
-                // Within braking distance - decelerate
                 const decelerationFactor = Math.pow(distanceToBrakePoint / brakingDistance, 0.25);
                 currentVelocity = maxVelocity * decelerationFactor;
             }
             
-            // Update speed display
-            const displaySpeed = Math.round(currentVelocity / 5); // Convert back to km/h
-            document.querySelector('.speed-indicator .speed-value').textContent = displaySpeed;
-            
-            // Add moving class to always show speed during animation
+            document.querySelector('.speed-indicator .speed-value').textContent = Math.round(currentVelocity / 5);
             carRear.classList.add('moving');
 
-            // Update car positions and get current distance
             const { realDistance } = updateCarSimulation(Math.min(currentCarBPos, endCarB));
 
             if (currentCarBPos < endCarB && isRunning && !isPaused) {
                 animationFrame = requestAnimationFrame(animateCarRear);
             } else {
-                isRunning = false;
-                simStartBtn.disabled = false;
-                simStopBtn.disabled = true;
-                carRear.classList.remove('moving');
-                // Update final positions and indicators
-                updateCarSimulation(endCarB);
-                // Show final speed (0 km/h)
-                document.querySelector('.speed-indicator .speed-value').textContent = '0';
+                stopSimulation();
+            }
+        }
+
+        function stopSimulation() {
+            isRunning = false;
+            simStartBtn.disabled = false;
+            simStopBtn.disabled = true;
+            carRear.classList.remove('moving');
+            document.querySelector('.speed-indicator .speed-value').textContent = '0';
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
             }
         }
 
@@ -1479,8 +1475,8 @@
             try {
                 // Collect current parameters
                 const params = {
-                    weather: sunnyOption.classList.contains('active') ? 'sunny' : 'rainy',
-                    roadSurface: asphaltOption.classList.contains('active') ? 'asphalt' : 'concrete',
+                    weather: sunnyOption.classList.contains('active') ? 'ClearNoon' : 'WetCloudySunset',
+                    roadSurface: asphaltOption.classList.contains('active') ? 'asphalt' : 'gravel',
                     speed: parseInt(speedSlider.value),
                     mass: parseInt(massSlider.value),
                     incline: parseInt(inclineSlider.value)
@@ -1496,7 +1492,14 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    let errorMsg = 'Network response was not ok';
+                    try {
+                        const errorData = await response.json();
+                        if (errorData && errorData.error) {
+                            errorMsg = errorData.error;
+                        }
+                    } catch (e) {}
+                    throw new Error(errorMsg);
                 }
 
                 const data = await response.json();
@@ -1520,8 +1523,7 @@
             isPaused = false;
             simStartBtn.disabled = true;
             simStopBtn.disabled = false;
-            simRestartBtn.disabled = false;
-            startTime = null;
+            startTime = null; // Reset start time
             animationFrame = requestAnimationFrame(animateCarRear);
         });
         simStopBtn.addEventListener('click', () => {
@@ -1530,21 +1532,20 @@
             isRunning = false;
             simStartBtn.disabled = false;
             simStopBtn.disabled = true;
-            if (animationFrame) cancelAnimationFrame(animationFrame);
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
         });
+
         simRestartBtn.addEventListener('click', () => {
-            isRunning = false;
-            isPaused = false;
-            simStartBtn.disabled = false;
-            simStopBtn.disabled = true;
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-            // Reset to starting position (outside frame)
-            updateCarSimulation(-80 - 50); // Car width + 50px outside
-            document.querySelector('.speed-indicator .speed-value').textContent = '0';
-            carRear.classList.remove('moving');
+            stopSimulation();
+            updateCarSimulation(-80 - 50); // Reset to starting position
+            distanceLabel.textContent = `Braking Distance: ${distanceSlider.value}m (Gap: 2m)`;
             carRear.classList.remove('lights-on');
             warningArcs.style.display = 'none';
         });
+
         // Update the distance slider event listener
         distanceSlider.addEventListener('input', function() {
             const distanceTraveled = this.value;
@@ -1562,15 +1563,12 @@
         });
         updateCarSimulation(0);
 
-        // Set all toggles to OFF when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Ensure road starts flat (0°)
             document.querySelector('.road').style.transform = 'translateY(-50%) rotate(0deg)';
             
-            
             setWeather(true);
-            updateCarSimulation();
-
+            
             // Reset mass
             massSlider.value = 1720;
             massValue.textContent = "1720 kg";
@@ -1578,7 +1576,17 @@
             updateMassSliderFill();
 
             updateSpeedSliderFill();
-            resetAllSettings();
+            
+            // Initialize with Car B at final position (2m gap)
+            updateCarSimulation();
+            
+            // Update the distance label to show correct initial values
+            const simulationWidth = simulationView.offsetWidth;
+            const carWidth = 80;
+            const carFrontPos = simulationWidth * 0.7;
+            const constantGap = 2 * PIXELS_PER_METER;
+            const brakingDistance = Math.round((carFrontPos - (parseFloat(carRear.style.left || '0') - carWidth - constantGap) / PIXELS_PER_METER));
+            distanceLabel.textContent = `Braking Distance: ${brakingDistance}m (Gap: 2m)`;
         });
         
         function resetAllSettings() {
@@ -1595,9 +1603,17 @@
             distanceSlider.value = 20;
             distanceValue.textContent = "20 m";
             updateDistanceSliderFill();
-            updateCarSimulation(); // Reset car positions
             
-            distanceLabel.textContent = "Braking Distance: 98m (Gap: 2m)";
+            // Position Car B at final position (2m gap)
+            updateCarSimulation();
+            
+            // Update distance label
+            const simulationWidth = simulationView.offsetWidth;
+            const carWidth = 80;
+            const carFrontPos = simulationWidth * 0.7;
+            const constantGap = 2 * PIXELS_PER_METER;
+            const brakingDistance = Math.round((carFrontPos - (parseFloat(carRear.style.left || '0') - carWidth - constantGap) / PIXELS_PER_METER));
+            distanceLabel.textContent = `Braking Distance: ${brakingDistance}m (Gap: 2m)`;
 
             // Reset speed
             speedSlider.value = 50;
@@ -1623,13 +1639,9 @@
                     
             // Reset road surface
             setRoadSurface(true);
-            
+
             // Reset simulation state
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-            isRunning = false;
-            isPaused = false;
-            simStartBtn.disabled = false;
-            simStopBtn.disabled = true;
+            stopSimulation();
         }
 
         // Call this on page load
