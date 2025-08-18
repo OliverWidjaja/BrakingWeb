@@ -824,6 +824,19 @@
             top: 30px;
             left: 80%;
         }
+
+        /* Add this at the end of your existing CSS */
+        @media (max-width: 768px) {
+            /* Hide sun and clouds on mobile */
+            .sun, .clouds {
+                display: none !important;
+            }
+            
+            /* Hide all trees on mobile */
+            .trees, .tree, .tree-trunk, .tree-top {
+                display: none !important;
+            }
+        }
         /* Footer */
         .footer {
             text-align: center;
