@@ -724,54 +724,6 @@
             color: #006699;
             font-weight: bold;
         }
-        @media (max-width: 1200px) {
-            .dashboard {
-                width: 95%;
-                max-width: 100%;
-                margin: 10px auto;
-            }
-            
-            .control-cards {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-            
-            .combined-card {
-                flex: 1 1 40%;
-                max-width: 48%;
-                min-width: 300px;
-            }
-            
-            .simulation-container {
-                flex: 1 1 55%;
-                max-width: 100%;
-                min-width: 300px;
-            }
-            
-            .card {
-                padding: 15px;
-            }
-            
-            /* Adjust font sizes for smaller screens */
-            .card-title, .simulation-title {
-                font-size: 1.1rem;
-            }
-            
-            .parameter-title {
-                font-size: 0.9rem;
-            }
-            
-            .slider-value {
-                font-size: 1.2rem;
-            }
-            
-            /* Make buttons smaller */
-            .sim-btn {
-                padding: 6px 12px;
-                font-size: 0.9rem;
-            }
-        }
         /* Replace the existing .car-weights and .car-weight styles with these: */
         .car-weights {
             position: absolute;
@@ -861,62 +813,108 @@
         }
 
         /* Add this media query for landscape mobile devices */
-        @media (max-width: 992px) and (orientation: landscape) {
+        @media (max-width: 1500px) and (orientation: landscape) {
             .dashboard {
-                width: 95%;
+                width: 100%;
                 max-width: 100%;
-                margin: 10px auto;
+                margin: 5px 0;
+                padding: 5px;
+                transform: scale(0.95);
+                transform-origin: top center;
             }
             
             .control-cards {
                 flex-direction: row;
                 flex-wrap: nowrap;
-                gap: 10px;
+                gap: 8px;
+                padding: 0;
             }
             
             .combined-card {
-                flex: 0 0 40%;
-                max-width: 40%;
+                flex: 1 1 45%;
+                max-width: 45%;
                 min-width: 0;
-                overflow: hidden;
+                padding: 10px;
             }
             
             .simulation-container {
-                flex: 0 0 60%;
-                max-width: 60%;
+                flex: 1 1 55%;
+                max-width: 55%;
                 min-width: 0;
+                padding: 10px;
             }
             
-            /* Make sliders more compact */
+            .card {
+                padding: 10px;
+            }
+            
+            /* Make titles smaller */
+            .card-title, .simulation-title {
+                font-size: 0.9rem;
+            }
+            
+            /* Compact sliders */
             .slider-group {
-                padding: 8px;
+                padding: 8px 5px;
+                margin-bottom: 10px;
             }
             
             .slider-value {
-                font-size: 1.2rem;
+                font-size: 1rem;
+            }
+            
+            /* Smaller buttons */
+            .sim-btn {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+                gap: 4px;
             }
             
             /* Adjust car size */
             .car {
-                width: 60px;
-                height: 30px;
-                font-size: 0.9rem;
+                width: 50px;
+                height: 25px;
+                font-size: 0.8rem;
             }
             
             /* Adjust traffic light size */
             .traffic-light {
-                width: 20px;
-                height: 60px;
+                width: 18px;
+                height: 50px;
             }
             
             .traffic-light-pole {
-                width: 8px;
-                height: 80px;
+                width: 6px;
+                height: 60px;
             }
             
             .light {
-                width: 15px;
-                height: 15px;
+                width: 12px;
+                height: 12px;
+            }
+            
+            /* Adjust road height */
+            .road {
+                height: 60px;
+            }
+            
+            /* Hide decorative elements */
+            .trees, .buildings, .weather-elements {
+                display: none;
+            }
+            
+            /* Compact weather toggles */
+            .weather-toggle-container {
+                gap: 3px;
+            }
+            
+            .weather-option {
+                padding: 2px 6px;
+                font-size: 0.7rem;
+            }
+            
+            .weather-divider {
+                display: none;
             }
             
             /* Adjust distance indicators */
@@ -925,119 +923,36 @@
             }
             
             .distance-value {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+            }
+            
+            .distance-label {
                 font-size: 0.7rem;
-                padding: 2px 6px;
+                padding: 4px 8px;
+                bottom: 25%;
             }
             
-            /* Make buttons smaller */
-            .sim-btn {
-                padding: 5px 10px;
-                font-size: 0.8rem;
+            /* Reduce header size */
+            header {
+                padding: 8px 10px;
             }
             
-            /* Adjust card titles */
-            .card-title, .simulation-title {
-                font-size: 1rem;
+            h1 {
+                font-size: 1.2rem;
             }
             
-            /* Adjust parameter titles */
-            .parameter-title {
-                font-size: 0.8rem;
+            .subtitle {
+                font-size: 0.7rem;
             }
             
-            /* Hide some decorative elements */
-            .trees, .buildings {
-                display: none;
-            }
-            
-            /* Adjust road height */
-            .road {
-                height: 80px;
-            }
-            
-            /* Adjust weather toggles */
-            .weather-toggle-container {
-                gap: 5px;
-            }
-            
-            .weather-option {
-                padding: 3px 8px;
-                font-size: 0.8rem;
-            }
-            
-            .weather-divider {
-                display: none;
+            /* Reduce footer size */
+            .footer {
+                padding: 8px;
+                font-size: 0.7rem;
             }
         }
 
-        @media (max-width: 768px) {
-            .control-cards {
-                flex-direction: row;
-                overflow-x: auto;
-                padding-bottom: 10px;
-                gap: 8px;
-            }
-            
-            .combined-card, .simulation-container {
-                flex: 0 0 90%;
-                min-width: 90%;
-                margin-right: 10px;
-            }
-            
-            /* Hide sun, clouds, rain, and traffic light on mobile */
-            .sun, .clouds, .rain-container, .traffic-light-container {
-                display: none !important;
-            }
-            
-            /* Hide all trees on mobile */
-            .trees, .tree, .tree-trunk, .tree-top {
-                display: none !important;
-            }
-            
-            /* Adjust the simulation view height to compensate for removed elements */
-            .simulation-view {
-                min-height: 250px;
-            }
-            
-            /* Make the dashboard slightly narrower on very small screens */
-            .dashboard {
-                width: 98%;
-            }
-        }
-
-        /* Add this for very small screens to prevent horizontal scrolling */
-        @media (max-width: 480px) {
-            html, body {
-                overflow-x: hidden;
-            }
-            
-            body {
-                padding: 5px;
-            }
-            
-            .dashboard {
-                width: 100%;
-                border-radius: 8px;
-            }
-            
-            .control-cards {
-                gap: 5px;
-            }
-            
-            .combined-card, .simulation-container {
-                flex: 0 0 95%;
-                min-width: 95%;
-            }
-            
-            .card {
-                padding: 10px;
-            }
-            
-            .sim-btn {
-                padding: 5px 10px;
-                font-size: 0.8rem;
-            }
-        }
         /* Footer */
         .footer {
             text-align: center;
