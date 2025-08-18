@@ -827,14 +827,19 @@
 
         /* Add this at the end of your existing CSS */
         @media (max-width: 768px) {
-            /* Hide sun and clouds on mobile */
-            .sun, .clouds {
+            /* Hide sun, clouds, rain, and traffic light on mobile */
+            .sun, .clouds, .rain-container, .traffic-light-container {
                 display: none !important;
             }
             
             /* Hide all trees on mobile */
             .trees, .tree, .tree-trunk, .tree-top {
                 display: none !important;
+            }
+            
+            /* Adjust the simulation view height to compensate for removed elements */
+            .simulation-view {
+                min-height: 250px;
             }
         }
         /* Footer */
