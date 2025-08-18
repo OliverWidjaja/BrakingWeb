@@ -990,7 +990,7 @@
                             </div>
                         </div>
                         <!-- Change this line in your HTML -->
-                        <div class="distance-label" id="distanceLabel">Braking Distance: X (Gap: Xm)</div>
+                        <div class="distance-label" id="distanceLabel">Braking Distance: 98m (Gap: 2m)</div>
                         <div class="scenery">
                             <div class="trees">
                                 <div class="tree"><div class="tree-trunk"></div><div class="tree-top"></div></div>
@@ -1475,8 +1475,8 @@
             try {
                 // Collect current parameters
                 const params = {
-                    weather: sunnyOption.classList.contains('active') ? 'sunny' : 'rainy',
-                    roadSurface: asphaltOption.classList.contains('active') ? 'asphalt' : 'concrete',
+                    weather: sunnyOption.classList.contains('active') ? 'ClearNoon' : 'WetCloudySunset',
+                    roadSurface: asphaltOption.classList.contains('active') ? 'asphalt' : 'gravel',
                     speed: parseInt(speedSlider.value),
                     mass: parseInt(massSlider.value),
                     incline: parseInt(inclineSlider.value)
@@ -1639,7 +1639,7 @@
                     
             // Reset road surface
             setRoadSurface(true);
-            
+
             // Reset simulation state
             stopSimulation();
         }
